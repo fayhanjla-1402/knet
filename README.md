@@ -51,7 +51,7 @@ Knet digunakan oleh operator warnet. Operator mengelola data member dan komputer
 | Anggota | Tugas |
 |---|---|
 | There | Database, class Koneksi, FormMenuUtama, FormMember |
-| Meshl | FormKomputer dan pengaturan status komputer |
+| Meshal | FormKomputer dan pengaturan status komputer |
 | Fayha | FormSesi (mulai, akhiri, hitung biaya) dan FormLaporan |
 
 ## 3. Rancangan Database
