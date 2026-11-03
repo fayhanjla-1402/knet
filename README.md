@@ -2,12 +2,7 @@
 
 ## 1. Ide Proyek
 
-**Knet** adalah aplikasi desktop untuk mengelola warnet, dibuat dengan Java Swing (JFrame) di NetBeans dan database MySQL. Aplikasi ini dipilih karena kasus penggunaannya dekat dengan kehidupan sehari-hari, relasi antartabelnya jelas, dan mencakup seluruh materi dasar: CRUD, transaksi, perhitungan otomatis, dan laporan.
-
-Masalah yang diselesaikan:
-- Pencatatan pemakaian komputer yang masih manual rawan salah hitung.
-- Operator sulit mengetahui komputer mana yang sedang kosong atau dipakai.
-- Pendapatan harian sulit direkap.
+**Knet** adalah aplikasi desktop untuk mengelola warnet, dibuat dengan Java Swing (JFrame) di NetBeans dan database MySQL. 
 
 Tujuan:
 - Menyimpan data member dan komputer secara terpusat.
@@ -55,9 +50,9 @@ Knet digunakan oleh operator warnet. Operator mengelola data member dan komputer
 
 | Anggota | Tugas |
 |---|---|
-| Anggota 1 | Database, class Koneksi, FormMenuUtama, FormMember |
-| Anggota 2 | FormKomputer dan pengaturan status komputer |
-| Anggota 3 | FormSesi (mulai, akhiri, hitung biaya) dan FormLaporan |
+| There | Database, class Koneksi, FormMenuUtama, FormMember |
+| Meshl | FormKomputer dan pengaturan status komputer |
+| Fayha | FormSesi (mulai, akhiri, hitung biaya) dan FormLaporan |
 
 ## 3. Rancangan Database
 
@@ -105,25 +100,7 @@ member (1) -------- (N) sesi (N) -------- (1) komputer
 
 Urutan penulisan di setiap class mengikuti pola: constructor, getter, setter, input, proses, output.
 
-### 4.1 Struktur Package
-
-```
-knet
- |-- koneksi
- |     |-- Koneksi.java
- |-- model
- |     |-- Member.java
- |     |-- Komputer.java
- |     |-- Sesi.java
- |-- form
-       |-- FormMenuUtama.java
-       |-- FormMember.java
-       |-- FormKomputer.java
-       |-- FormSesi.java
-       |-- FormLaporan.java
-```
-
-### 4.2 Class Koneksi
+### 4.1 Class Koneksi
 
 Tugas: membuat dan menyediakan koneksi JDBC ke database `db_knet`.
 
@@ -132,7 +109,7 @@ Tugas: membuat dan menyediakan koneksi JDBC ke database `db_knet`.
 | Atribut | url, user, password, koneksi |
 | Method | getKoneksi() |
 
-### 4.3 Class Member
+### 4.2 Class Member
 
 Tugas: menampung data satu member.
 
@@ -143,7 +120,7 @@ Tugas: menampung data satu member.
 | Getter | getIdMember, getNama, getNoHp, getTanggalDaftar |
 | Setter | setIdMember, setNama, setNoHp, setTanggalDaftar |
 
-### 4.4 Class Komputer
+### 4.3 Class Komputer
 
 Tugas: menampung data satu komputer.
 
@@ -154,7 +131,7 @@ Tugas: menampung data satu komputer.
 | Getter | getIdKomputer, getNamaKomputer, getTarifPerJam, getStatus |
 | Setter | setIdKomputer, setNamaKomputer, setTarifPerJam, setStatus |
 
-### 4.5 Class Sesi
+### 4.4 Class Sesi
 
 Tugas: menampung data satu sesi pemakaian.
 
@@ -165,7 +142,7 @@ Tugas: menampung data satu sesi pemakaian.
 | Getter | getIdSesi, getIdMember, getIdKomputer, getJamMulai, getJamSelesai, getTotalBiaya |
 | Setter | setIdSesi, setIdMember, setIdKomputer, setJamMulai, setJamSelesai, setTotalBiaya |
 
-### 4.6 Class FormMember
+### 4.5 Class FormMember
 
 | Jenis | Nama |
 |---|---|
@@ -173,7 +150,7 @@ Tugas: menampung data satu sesi pemakaian.
 | Proses | simpanMember, ubahMember, hapusMember, cariMember |
 | Output | tampilMember, kosongkanForm |
 
-### 4.7 Class FormKomputer
+### 4.6 Class FormKomputer
 
 | Jenis | Nama |
 |---|---|
@@ -181,7 +158,7 @@ Tugas: menampung data satu sesi pemakaian.
 | Proses | simpanKomputer, ubahKomputer, hapusKomputer, ubahStatusKomputer |
 | Output | tampilKomputer, kosongkanForm |
 
-### 4.8 Class FormSesi
+### 4.7 Class FormSesi
 
 | Jenis | Nama |
 |---|---|
@@ -189,7 +166,7 @@ Tugas: menampung data satu sesi pemakaian.
 | Proses | mulaiSesi, akhiriSesi, hitungLamaPakai, hitungTotalBiaya, ubahStatusKomputer |
 | Output | tampilSesiBerjalan, tampilTotalBiaya |
 
-### 4.9 Class FormLaporan
+### 4.8 Class FormLaporan
 
 | Jenis | Nama |
 |---|---|
@@ -197,13 +174,13 @@ Tugas: menampung data satu sesi pemakaian.
 | Proses | hitungPendapatanHarian |
 | Output | tampilRiwayatSesi, tampilTotalPendapatan |
 
-### 4.10 Class FormMenuUtama
+### 4.9 Class FormMenuUtama
 
 | Jenis | Nama |
 |---|---|
 | Proses | bukaFormMember, bukaFormKomputer, bukaFormSesi, bukaFormLaporan |
 
-### 4.11 Hubungan Antarclass
+### 4.10 Hubungan Antarclass
 
 ```
 FormMember   --> Member   --> Koneksi --> db_knet
