@@ -85,7 +85,7 @@ Nama database: `db_knet`
 | idKomputer | INT | Foreign Key ke komputer.idKomputer |
 | jamMulai | DATETIME | Waktu sesi dimulai |
 | jamSelesai | DATETIME | Waktu sesi berakhir, kosong jika masih berjalan |
-| totalBiaya | INT | Lama pakai (jam) dikali tarif per jam |
+| totalBiaya | DOUBLE | Lama pakai (jam) dikali tarif per jam |
 
 ### 3.4 Relasi Antartabel
 
