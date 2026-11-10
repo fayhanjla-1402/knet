@@ -68,7 +68,7 @@ Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `
 
 ## 5. Pembagian File per Anggota
 
-### Anggota 1: Member dan Fondasi Database
+### Theresia : Member dan Fondasi Database
 
 | File | Keterangan |
 |---|---|
@@ -80,7 +80,7 @@ Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `
 | view/FormMember.java | Form member |
 | README.md | Dokumentasi proyek |
 
-### Anggota 2: Komputer dan Menu
+### Meshal : Komputer dan Menu
 
 | File | Keterangan |
 |---|---|
@@ -90,7 +90,7 @@ Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `
 | view/FormKomputer.java | Form komputer |
 | view/FormMenuUtama.java | Menu navigasi |
 
-### Anggota 3: Sesi, Laporan, dan Logika Database
+### Fayha : Sesi, Laporan, dan Logika Database
 
 | File | Keterangan |
 |---|---|
