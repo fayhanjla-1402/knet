@@ -1,191 +1,110 @@
-# Proyek Knet: Aplikasi Manajemen Warnet
+# Knet: Aplikasi Manajemen Warnet
+
+Aplikasi desktop sederhana berbasis Java Swing dan MySQL untuk mengelola member, komputer, dan sesi pemakaian warnet. Fokus proyek ada di sisi database: aplikasi dibuat ringkas, tetapi fitur database dimanfaatkan maksimal.
 
 ## 1. Ide Proyek
 
-**Knet** adalah aplikasi desktop untuk mengelola warnet, dibuat dengan Java Swing (JFrame) di NetBeans dan database MySQL. 
+Operator warnet sering mencatat pemakaian komputer secara manual sehingga rawan salah hitung dan status komputer tidak jelas. Knet mencatat sesi pemakaian, menghitung biaya, dan memperbarui status komputer secara otomatis lewat database.
 
-Tujuan:
-- Menyimpan data member dan komputer secara terpusat.
-- Mencatat sesi pemakaian dan menghitung biaya otomatis.
-- Menampilkan riwayat sesi dan total pendapatan per hari.
-
-## 2. Gambaran Aplikasi
-
-### 2.1 Deskripsi Aplikasi
-
-Knet digunakan oleh operator warnet. Operator mengelola data member dan komputer, lalu mencatat sesi pemakaian setiap pelanggan. Saat sesi dimulai, status komputer berubah menjadi Dipakai. Saat sesi diakhiri, sistem menghitung lama pemakaian dan total biaya, lalu status komputer kembali menjadi Tersedia. Seluruh data tersimpan di database MySQL dan ditampilkan melalui form Swing.
-
-### 2.2 Perencanaan Alur
-
-1. Operator membuka aplikasi dan masuk ke menu utama.
-2. Operator mendaftarkan member baru di form Member.
-3. Operator memastikan data komputer dan tarif per jam sudah terisi di form Komputer.
-4. Saat pelanggan datang, operator membuka form Sesi, memilih member dan komputer yang berstatus Tersedia, lalu menekan tombol Mulai.
-5. Sistem mencatat jam mulai dan mengubah status komputer menjadi Dipakai.
-6. Saat pelanggan selesai, operator memilih sesi yang berjalan lalu menekan tombol Akhiri.
-7. Sistem mencatat jam selesai, menghitung total biaya, dan mengubah status komputer menjadi Tersedia.
-8. Di akhir hari, operator membuka form Laporan untuk melihat riwayat sesi dan total pendapatan.
-
-### 2.3 Fungsionalitas
+## 2. Fungsionalitas Inti
 
 | No | Modul | Fungsi |
 |---|---|---|
-| 1 | Member | Tambah, ubah, hapus, dan cari data member |
-| 2 | Komputer | Tambah, ubah, hapus data komputer, atur tarif per jam |
-| 3 | Sesi | Mulai sesi, akhiri sesi, hitung total biaya otomatis, ubah status komputer otomatis |
-| 4 | Laporan | Tampilkan riwayat sesi, tampilkan total pendapatan per tanggal |
-| 5 | Menu Utama | Navigasi ke seluruh form |
+| 1 | Member | Tambah, ubah, hapus, cari |
+| 2 | Komputer | Tambah, ubah, hapus, atur tarif per jam |
+| 3 | Sesi | Mulai sesi dan akhiri sesi (biaya dan status komputer otomatis) |
+| 4 | Laporan | Riwayat sesi dan total pendapatan per tanggal |
 
-### 2.4 Daftar Form
+### Alur Singkat
 
-| Form | Isi Utama |
-|---|---|
-| FormMenuUtama | Tombol navigasi ke form lain |
-| FormMember | Field input, tombol Simpan, Ubah, Hapus, Cari, dan JTable |
-| FormKomputer | Field input, tombol Simpan, Ubah, Hapus, dan JTable |
-| FormSesi | JComboBox member dan komputer, tombol Mulai dan Akhiri, JTable sesi |
-| FormLaporan | Pilihan tanggal, JTable riwayat, label total pendapatan |
-
-### 2.5 Pembagian Tugas
-
-| Anggota | Tugas |
-|---|---|
-| There | Database, class Koneksi, FormMenuUtama, FormMember |
-| Meshal | FormKomputer dan pengaturan status komputer |
-| Fayha | FormSesi (mulai, akhiri, hitung biaya) dan FormLaporan |
+1. Operator mendaftarkan member dan mengisi data komputer.
+2. Operator memilih member dan komputer yang Tersedia, lalu menekan Mulai.
+3. Status komputer otomatis menjadi Dipakai.
+4. Operator menekan Akhiri, lalu biaya dihitung dan status komputer kembali Tersedia.
+5. Operator melihat riwayat dan pendapatan di form Laporan.
 
 ## 3. Rancangan Database
 
 Nama database: `db_knet`
 
-### 3.1 Tabel `member`
+### Tabel
 
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| idMember | INT, AUTO_INCREMENT | Primary Key |
-| nama | VARCHAR(50) | Nama member |
-| noHp | VARCHAR(15) | Nomor HP |
-| tanggalDaftar | DATE | Tanggal mendaftar |
+**member**: idMember (PK), nama, noHp, tanggalDaftar
 
-### 3.2 Tabel `komputer`
+**komputer**: idKomputer (PK), namaKomputer (UNIQUE), tarifPerJam, status (Tersedia / Dipakai)
 
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| idKomputer | INT, AUTO_INCREMENT | Primary Key |
-| namaKomputer | VARCHAR(30) | Contoh: PC-01 |
-| tarifPerJam | INT | Tarif sewa per jam |
-| status | VARCHAR(10) | Tersedia atau Dipakai |
+**sesi**: idSesi (PK), idMember (FK), idKomputer (FK), jamMulai, jamSelesai, totalBiaya
 
-### 3.3 Tabel `sesi`
-
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| idSesi | INT, AUTO_INCREMENT | Primary Key |
-| idMember | INT | Foreign Key ke member.idMember |
-| idKomputer | INT | Foreign Key ke komputer.idKomputer |
-| jamMulai | DATETIME | Waktu sesi dimulai |
-| jamSelesai | DATETIME | Waktu sesi berakhir, kosong jika masih berjalan |
-| totalBiaya | DOUBLE | Lama pakai (jam) dikali tarif per jam |
-
-### 3.4 Relasi Antartabel
-
-- Satu member dapat memiliki banyak sesi (1 : N).
-- Satu komputer dapat dipakai pada banyak sesi (1 : N).
+### Relasi
 
 ```
 member (1) -------- (N) sesi (N) -------- (1) komputer
 ```
 
+### Fitur Database yang Dipakai
+
+| Fitur | Nama | Fungsi |
+|---|---|---|
+| Foreign Key | sesi.idMember, sesi.idKomputer | Menjaga keterkaitan data antartabel |
+| Constraint | NOT NULL, UNIQUE, DEFAULT | Menjaga data tetap valid |
+| View | vRiwayatSesi | Gabungan sesi, member, dan komputer (JOIN) untuk laporan |
+| Trigger | trgSesiMulai | Setelah sesi ditambah, status komputer menjadi Dipakai |
+| Trigger | trgSesiSelesai | Setelah jamSelesai terisi, status komputer menjadi Tersedia |
+| Stored Procedure | spAkhiriSesi | Mengisi jamSelesai dan menghitung totalBiaya |
+| Query Agregat | GROUP BY + SUM | Total pendapatan per tanggal |
+
 ## 4. Rancangan Class
 
-Urutan penulisan di setiap class mengikuti pola: constructor, getter, setter, input, proses, output.
+Pola penulisan setiap class: constructor, getter, setter, input, proses, output.
 
-### 4.1 Class Koneksi
+| Package | Class | Tugas |
+|---|---|---|
+| entity | Member, Komputer, Sesi | Menampung data (atribut, constructor, getter, setter) |
+| model | MemberTableModel, KomputerTableModel, SesiTableModel | Mengatur data untuk tampilan JTable |
+| repository | Koneksi, MemberRepository, KomputerRepository, SesiRepository | Akses database lewat JDBC |
+| view | FormMenuUtama, FormMember, FormKomputer, FormSesi, FormLaporan | Tampilan form Swing |
 
-Tugas: membuat dan menyediakan koneksi JDBC ke database `db_knet`.
+Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `ambilSemuaData`. Khusus SesiRepository: `mulaiSesi`, `akhiriSesi`, `ambilRiwayat`, `ambilPendapatanHarian`.
 
-| Jenis | Nama |
+## 5. Pembagian File per Anggota
+
+### Anggota 1: Member dan Fondasi Database
+
+| File | Keterangan |
 |---|---|
-| Atribut | url, user, password, koneksi |
-| Method | getKoneksi() |
+| resources/script.sql | Bagian pembuatan database, tabel, constraint, dan data awal |
+| repository/Koneksi.java | Koneksi JDBC |
+| entity/Member.java | Data member |
+| model/MemberTableModel.java | Tabel member |
+| repository/MemberRepository.java | CRUD member |
+| view/FormMember.java | Form member |
+| README.md | Dokumentasi proyek |
 
-### 4.2 Class Member
+### Anggota 2: Komputer dan Menu
 
-Tugas: menampung data satu member.
-
-| Jenis | Nama |
+| File | Keterangan |
 |---|---|
-| Atribut | idMember, nama, noHp, tanggalDaftar |
-| Constructor | Member(), Member(idMember, nama, noHp, tanggalDaftar) |
-| Getter | getIdMember, getNama, getNoHp, getTanggalDaftar |
-| Setter | setIdMember, setNama, setNoHp, setTanggalDaftar |
+| entity/Komputer.java | Data komputer |
+| model/KomputerTableModel.java | Tabel komputer |
+| repository/KomputerRepository.java | CRUD komputer |
+| view/FormKomputer.java | Form komputer |
+| view/FormMenuUtama.java | Menu navigasi |
 
-### 4.3 Class Komputer
+### Anggota 3: Sesi, Laporan, dan Logika Database
 
-Tugas: menampung data satu komputer.
-
-| Jenis | Nama |
+| File | Keterangan |
 |---|---|
-| Atribut | idKomputer, namaKomputer, tarifPerJam, status |
-| Constructor | Komputer(), Komputer(idKomputer, namaKomputer, tarifPerJam, status) |
-| Getter | getIdKomputer, getNamaKomputer, getTarifPerJam, getStatus |
-| Setter | setIdKomputer, setNamaKomputer, setTarifPerJam, setStatus |
+| resources/script.sql | Bagian view, trigger, dan stored procedure |
+| entity/Sesi.java | Data sesi |
+| model/SesiTableModel.java | Tabel sesi dan riwayat |
+| repository/SesiRepository.java | Mulai sesi, akhiri sesi, riwayat, pendapatan |
+| view/FormSesi.java | Form sesi |
+| view/FormLaporan.java | Form laporan |
 
-### 4.4 Class Sesi
+File `script.sql` dikerjakan bersama: Anggota 1 menulis bagian tabel, Anggota 3 menambahkan view, trigger, dan stored procedure di bagian bawahnya.
 
-Tugas: menampung data satu sesi pemakaian.
+## 6. Cara Menjalankan
 
-| Jenis | Nama |
-|---|---|
-| Atribut | idSesi, idMember, idKomputer, jamMulai, jamSelesai, totalBiaya |
-| Constructor | Sesi(), Sesi(idSesi, idMember, idKomputer, jamMulai, jamSelesai, totalBiaya) |
-| Getter | getIdSesi, getIdMember, getIdKomputer, getJamMulai, getJamSelesai, getTotalBiaya |
-| Setter | setIdSesi, setIdMember, setIdKomputer, setJamMulai, setJamSelesai, setTotalBiaya |
-
-### 4.5 Class FormMember
-
-| Jenis | Nama |
-|---|---|
-| Input | inputMember |
-| Proses | simpanMember, ubahMember, hapusMember, cariMember |
-| Output | tampilMember, kosongkanForm |
-
-### 4.6 Class FormKomputer
-
-| Jenis | Nama |
-|---|---|
-| Input | inputKomputer |
-| Proses | simpanKomputer, ubahKomputer, hapusKomputer, ubahStatusKomputer |
-| Output | tampilKomputer, kosongkanForm |
-
-### 4.7 Class FormSesi
-
-| Jenis | Nama |
-|---|---|
-| Input | inputSesi, isiComboMember, isiComboKomputer |
-| Proses | mulaiSesi, akhiriSesi, hitungLamaPakai, hitungTotalBiaya, ubahStatusKomputer |
-| Output | tampilSesiBerjalan, tampilTotalBiaya |
-
-### 4.8 Class FormLaporan
-
-| Jenis | Nama |
-|---|---|
-| Input | inputTanggal |
-| Proses | hitungPendapatanHarian |
-| Output | tampilRiwayatSesi, tampilTotalPendapatan |
-
-### 4.9 Class FormMenuUtama
-
-| Jenis | Nama |
-|---|---|
-| Proses | bukaFormMember, bukaFormKomputer, bukaFormSesi, bukaFormLaporan |
-
-### 4.10 Hubungan Antarclass
-
-```
-FormMember   --> Member   --> Koneksi --> db_knet
-FormKomputer --> Komputer --> Koneksi --> db_knet
-FormSesi     --> Sesi, Member, Komputer --> Koneksi --> db_knet
-FormLaporan  --> Sesi, Member, Komputer --> Koneksi --> db_knet
-FormMenuUtama --> membuka seluruh form
-```
+1. Jalankan `src/main/resources/script.sql` di MySQL untuk membuat database `db_knet`.
+2. Sesuaikan url, user, dan password di `Koneksi.java`.
+3. Buka proyek di NetBeans, lalu jalankan `FormMenuUtama`.
