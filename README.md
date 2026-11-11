@@ -48,10 +48,11 @@ member (1) -------- (N) sesi (N) -------- (1) komputer
 | Foreign Key | sesi.idMember, sesi.idKomputer | Menjaga keterkaitan data antartabel |
 | Constraint | NOT NULL, UNIQUE, DEFAULT | Menjaga data tetap valid |
 | View | vRiwayatSesi | Gabungan sesi, member, dan komputer (JOIN) untuk laporan |
+| Trigger | trgSesiCekKomputer | Sebelum sesi ditambah, menolak jika komputer masih Dipakai |
 | Trigger | trgSesiMulai | Setelah sesi ditambah, status komputer menjadi Dipakai |
 | Trigger | trgSesiSelesai | Setelah jamSelesai terisi, status komputer menjadi Tersedia |
-| Stored Procedure | spAkhiriSesi | Mengisi jamSelesai dan menghitung totalBiaya |
-| Query Agregat | GROUP BY + SUM | Total pendapatan per tanggal |
+| Stored Procedure | spAkhiriSesi | Mengisi jamSelesai dan menghitung totalBiaya (dibulatkan ke atas per jam, minimal 1 jam) |
+| Query Agregat | SUM + WHERE | Total pendapatan pada tanggal yang dipilih, dan pendapatan keseluruhan |
 
 ## 4. Rancangan Class
 
@@ -64,7 +65,7 @@ Pola penulisan setiap class: constructor, getter, setter, input, proses, output.
 | repository | Koneksi, MemberRepository, KomputerRepository, SesiRepository | Akses database lewat JDBC |
 | view | FormMenuUtama, FormMember, FormKomputer, FormSesi, FormLaporan | Tampilan form Swing |
 
-Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `ambilSemuaData`. Khusus SesiRepository: `mulaiSesi`, `akhiriSesi`, `ambilRiwayat`, `ambilPendapatanHarian`.
+Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `ambilSemuaData`. Khusus SesiRepository: `mulaiSesi`, `akhiriSesi` (memanggil `spAkhiriSesi`), `ambilSesiBerjalan`, `ambilRiwayat`, `ambilRiwayatPerTanggal`, `ambilPendapatanPerTanggal`, `ambilPendapatanTotal`.
 
 ## 5. Pembagian File per Anggota
 
@@ -101,10 +102,10 @@ Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `
 | view/FormSesi.java | Form sesi |
 | view/FormLaporan.java | Form laporan |
 
-File `script.sql` dikerjakan bersama: Anggota 1 menulis bagian tabel, Anggota 3 menambahkan view, trigger, dan stored procedure di bagian bawahnya.
+File `script.sql` dikerjakan bersama: bagian tabel dan data awal member/komputer ditulis lebih dulu, lalu view, trigger, dan stored procedure di bawahnya, dan data awal sesi ditaruh paling akhir supaya trigger sudah aktif.
 
 ## 6. Cara Menjalankan
 
-1. Jalankan `src/main/resources/script.sql` di MySQL untuk membuat database `db_knet`.
+1. Jalankan `src/main/resources/script.sql` di MySQL (klien `mysql`, Workbench, atau HeidiSQL) untuk membuat database `db_knet`, termasuk view, trigger, dan stored procedure.
 2. Sesuaikan url, user, dan password di `Koneksi.java`.
-3. Buka proyek di NetBeans, lalu jalankan `FormMenuUtama`.
+3. Buka proyek di NetBeans (Maven akan mengunduh MySQL Connector/J otomatis), lalu jalankan class `Knet` atau `FormMenuUtama`.
