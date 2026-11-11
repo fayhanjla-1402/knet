@@ -1,4 +1,4 @@
-package knet.view;
+package com.mycompany.knet.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

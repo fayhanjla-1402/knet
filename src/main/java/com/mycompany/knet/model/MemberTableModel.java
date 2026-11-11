@@ -1,20 +1,20 @@
-package knet.model;
+package com.mycompany.knet.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import knet.entity.Member;
+import com.mycompany.knet.entity.Member;
 
-public class MemberModel extends AbstractTableModel {
+public class MemberTableModel extends AbstractTableModel {
 
     private List<Member> daftarMember;
     private String[] namaKolom = {"ID", "Nama", "No HP", "Tanggal Daftar"};
 
-    public MemberModel() {
+    public MemberTableModel() {
         this.daftarMember = new ArrayList<Member>();
     }
 
-    public MemberModel(List<Member> daftarMember) {
+    public MemberTableModel(List<Member> daftarMember) {
         this.daftarMember = daftarMember;
     }
 

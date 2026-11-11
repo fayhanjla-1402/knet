@@ -35,15 +35,8 @@ INSERT INTO member (nama, noHp, tanggalDaftar) VALUES
 INSERT INTO komputer (namaKomputer, tarifPerJam, status) VALUES
 ('PC-01', 5000, 'Tersedia'),
 ('PC-02', 5000, 'Tersedia'),
-('PC-03', 7000, 'Dipakai'),
+('PC-03', 7000, 'Tersedia'),
 ('PC-04', 7000, 'Tersedia');
-
-INSERT INTO sesi (idMember, idKomputer, jamMulai, jamSelesai, totalBiaya) VALUES
-(1, 1, '2026-11-09 10:00:00', '2026-11-09 12:00:00', 10000),
-(2, 2, '2026-11-09 13:00:00', '2026-11-09 14:30:00', 10000);
-
-INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES
-(3, 3, '2026-11-10 09:00:00');
 
 CREATE VIEW vRiwayatSesi AS
 SELECT
@@ -58,3 +51,74 @@ SELECT
 FROM sesi
 JOIN member ON sesi.idMember = member.idMember
 JOIN komputer ON sesi.idKomputer = komputer.idKomputer;
+
+DELIMITER $$
+
+-- Mencegah sesi baru dimulai di komputer yang masih Dipakai
+CREATE TRIGGER trgSesiCekKomputer
+BEFORE INSERT ON sesi
+FOR EACH ROW
+BEGIN
+    IF NEW.jamSelesai IS NULL
+       AND (SELECT status FROM komputer WHERE idKomputer = NEW.idKomputer) <> 'Tersedia' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Komputer sedang dipakai';
+    END IF;
+END$$
+
+-- Setelah sesi ditambah, status komputer menjadi Dipakai
+CREATE TRIGGER trgSesiMulai
+AFTER INSERT ON sesi
+FOR EACH ROW
+BEGIN
+    IF NEW.jamSelesai IS NULL THEN
+        UPDATE komputer SET status = 'Dipakai' WHERE idKomputer = NEW.idKomputer;
+    END IF;
+END$$
+
+-- Setelah jamSelesai terisi, status komputer menjadi Tersedia
+CREATE TRIGGER trgSesiSelesai
+AFTER UPDATE ON sesi
+FOR EACH ROW
+BEGIN
+    IF OLD.jamSelesai IS NULL AND NEW.jamSelesai IS NOT NULL THEN
+        UPDATE komputer SET status = 'Tersedia' WHERE idKomputer = NEW.idKomputer;
+    END IF;
+END$$
+
+-- Mengisi jamSelesai dan menghitung totalBiaya (dibulatkan ke atas per jam, minimal 1 jam).
+-- p_totalBiaya = -1 jika sesi tidak ditemukan atau sudah selesai.
+CREATE PROCEDURE spAkhiriSesi(IN p_idSesi INT, OUT p_totalBiaya INT)
+BEGIN
+    DECLARE v_mulai DATETIME DEFAULT NULL;
+    DECLARE v_tarif INT DEFAULT 0;
+    DECLARE v_selesai DATETIME;
+    DECLARE v_jam INT;
+
+    SELECT sesi.jamMulai, komputer.tarifPerJam
+    INTO v_mulai, v_tarif
+    FROM sesi
+    JOIN komputer ON sesi.idKomputer = komputer.idKomputer
+    WHERE sesi.idSesi = p_idSesi AND sesi.jamSelesai IS NULL;
+
+    IF v_mulai IS NULL THEN
+        SET p_totalBiaya = -1;
+    ELSE
+        SET v_selesai = NOW();
+        SET v_jam = GREATEST(1, CEIL(TIMESTAMPDIFF(MINUTE, v_mulai, v_selesai) / 60));
+        SET p_totalBiaya = v_jam * v_tarif;
+
+        UPDATE sesi
+        SET jamSelesai = v_selesai, totalBiaya = p_totalBiaya
+        WHERE idSesi = p_idSesi;
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- Data awal sesi (dimasukkan setelah trigger dibuat agar status komputer ikut terisi otomatis)
+INSERT INTO sesi (idMember, idKomputer, jamMulai, jamSelesai, totalBiaya) VALUES
+(1, 1, '2026-11-09 10:00:00', '2026-11-09 12:00:00', 10000),
+(2, 2, '2026-11-09 13:00:00', '2026-11-09 14:30:00', 10000);
+
+INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES
+(3, 3, '2026-11-10 09:00:00');

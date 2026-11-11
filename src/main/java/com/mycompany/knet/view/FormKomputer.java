@@ -1,4 +1,4 @@
-package knet.view;
+package com.mycompany.knet.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +14,9 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import knet.entity.Komputer;
-import knet.model.KomputerTableModel;
-import knet.repository.KomputerRepository;
+import com.mycompany.knet.entity.Komputer;
+import com.mycompany.knet.model.KomputerTableModel;
+import com.mycompany.knet.repository.KomputerRepository;
 
 public class FormKomputer extends JFrame implements ActionListener, ListSelectionListener {
 

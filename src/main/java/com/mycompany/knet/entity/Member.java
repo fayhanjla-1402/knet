@@ -1,4 +1,4 @@
-package knet.entity;
+package com.mycompany.knet.entity;
 
 import java.sql.Date;
 

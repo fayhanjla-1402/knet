@@ -1,4 +1,4 @@
-package knet.view;
+package com.mycompany.knet.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,9 +11,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import knet.entity.Sesi;
-import knet.model.SesiTableModel;
-import knet.repository.SesiRepository;
+import com.mycompany.knet.entity.Sesi;
+import com.mycompany.knet.model.SesiTableModel;
+import com.mycompany.knet.repository.SesiRepository;
 
 public class FormLaporan extends JFrame implements ActionListener {
 

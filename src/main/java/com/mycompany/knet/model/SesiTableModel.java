@@ -13,15 +13,15 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author Vivob
  */
-public class SesiModel extends AbstractTableModel {
+public class SesiTableModel extends AbstractTableModel {
     private List<Sesi> daftarSesi;
     private String[] namaKolom = {"ID Sesi", "Member", "Komputer", "Jam Mulai", "Jam Selesai", "Total Biaya"};
  
-    public SesiModel() {
+    public SesiTableModel() {
         this.daftarSesi = new ArrayList<Sesi>();
     }
  
-    public SesiModel(List<Sesi> daftarSesi) {
+    public SesiTableModel(List<Sesi> daftarSesi) {
         this.daftarSesi = daftarSesi;
     }
  

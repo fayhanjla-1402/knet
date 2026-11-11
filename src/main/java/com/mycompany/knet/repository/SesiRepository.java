@@ -1,38 +1,35 @@
-package knet.repository;
+package com.mycompany.knet.repository;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import knet.entity.Sesi;
+import com.mycompany.knet.entity.Sesi;
 
 public class SesiRepository {
 
     private Connection koneksi;
-    private KomputerRepository komputerRepository;
 
     public SesiRepository() {
         this.koneksi = Koneksi.getKoneksi();
-        this.komputerRepository = new KomputerRepository();
     }
 
+    // Status komputer diubah otomatis oleh trigger trgSesiMulai.
+    // Trigger trgSesiCekKomputer menolak sesi baru jika komputer masih Dipakai.
     public boolean mulaiSesi(int idMember, int idKomputer) {
-        String sql = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
 
         try {
-            Timestamp sekarang = new Timestamp(System.currentTimeMillis());
             PreparedStatement ps = koneksi.prepareStatement(sql);
             ps.setInt(1, idMember);
             ps.setInt(2, idKomputer);
-            ps.setTimestamp(3, sekarang);
             ps.executeUpdate();
             ps.close();
-
-            komputerRepository.ubahStatus(idKomputer, "Dipakai");
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -40,60 +37,24 @@ public class SesiRepository {
         }
     }
 
+    // Jam selesai, total biaya, dan status komputer dihitung di database
+    // lewat stored procedure spAkhiriSesi dan trigger trgSesiSelesai.
+    // Mengembalikan total biaya, atau -1 jika gagal.
     public int akhiriSesi(int idSesi) {
-        String sqlAmbil = "SELECT sesi.idKomputer, sesi.jamMulai, komputer.tarifPerJam "
-                + "FROM sesi JOIN komputer ON sesi.idKomputer = komputer.idKomputer "
-                + "WHERE sesi.idSesi = ? AND sesi.jamSelesai IS NULL";
-        String sqlUbah = "UPDATE sesi SET jamSelesai = ?, totalBiaya = ? WHERE idSesi = ?";
         int totalBiaya = -1;
 
         try {
-            PreparedStatement psAmbil = koneksi.prepareStatement(sqlAmbil);
-            psAmbil.setInt(1, idSesi);
-            ResultSet rs = psAmbil.executeQuery();
-
-            if (rs.next()) {
-                int idKomputer = rs.getInt("idKomputer");
-                Timestamp jamMulai = rs.getTimestamp("jamMulai");
-                int tarifPerJam = rs.getInt("tarifPerJam");
-                Timestamp jamSelesai = new Timestamp(System.currentTimeMillis());
-
-                totalBiaya = hitungTotalBiaya(jamMulai, jamSelesai, tarifPerJam);
-
-                PreparedStatement psUbah = koneksi.prepareStatement(sqlUbah);
-                psUbah.setTimestamp(1, jamSelesai);
-                psUbah.setInt(2, totalBiaya);
-                psUbah.setInt(3, idSesi);
-                psUbah.executeUpdate();
-                psUbah.close();
-
-                komputerRepository.ubahStatus(idKomputer, "Tersedia");
-            }
-
-            rs.close();
-            psAmbil.close();
+            CallableStatement cs = koneksi.prepareCall("{CALL spAkhiriSesi(?, ?)}");
+            cs.setInt(1, idSesi);
+            cs.registerOutParameter(2, Types.INTEGER);
+            cs.execute();
+            totalBiaya = cs.getInt(2);
+            cs.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            totalBiaya = -1;
         }
 
         return totalBiaya;
-    }
-
-    public int hitungTotalBiaya(Timestamp jamMulai, Timestamp jamSelesai, int tarifPerJam) {
-        long selisihMilidetik = jamSelesai.getTime() - jamMulai.getTime();
-        long totalMenit = selisihMilidetik / 60000;
-        long lamaJam = totalMenit / 60;
-
-        if (totalMenit % 60 > 0) {
-            lamaJam = lamaJam + 1;
-        }
-
-        if (lamaJam < 1) {
-            lamaJam = 1;
-        }
-
-        return (int) (lamaJam * tarifPerJam);
     }
 
     public List<Sesi> ambilSesiBerjalan() {

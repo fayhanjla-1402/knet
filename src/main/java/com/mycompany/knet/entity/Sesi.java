@@ -4,7 +4,7 @@
  */
 package com.mycompany.knet.entity;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /**
  *

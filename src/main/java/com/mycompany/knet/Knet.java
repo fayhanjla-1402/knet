@@ -1,16 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.mycompany.knet;
 
-/**
- *
- * @author Vivob
- */
+import com.mycompany.knet.view.FormMenuUtama;
+import javax.swing.SwingUtilities;
+
 public class Knet {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                FormMenuUtama.main(args);
+            }
+        });
     }
 }
