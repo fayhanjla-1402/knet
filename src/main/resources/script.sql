@@ -28,9 +28,9 @@ CREATE TABLE sesi (
 );
 
 INSERT INTO member (nama, noHp, tanggalDaftar) VALUES
-('Andi', '081234567801', '2026-11-01'),
-('Budi', '081234567802', '2026-11-02'),
-('Citra', '081234567803', '2026-11-03');
+('Fayha', '081234567801', '2026-11-01'),
+('Theresia', '081234567802', '2026-11-02'),
+('Mardova', '081234567803', '2026-11-03');
 
 INSERT INTO komputer (namaKomputer, tarifPerJam, status) VALUES
 ('PC-01', 5000, 'Tersedia'),
@@ -115,7 +115,6 @@ END$$
 
 DELIMITER ;
 
--- Data awal sesi (dimasukkan setelah trigger dibuat agar status komputer ikut terisi otomatis)
 INSERT INTO sesi (idMember, idKomputer, jamMulai, jamSelesai, totalBiaya) VALUES
 (1, 1, '2026-11-09 10:00:00', '2026-11-09 12:00:00', 10000),
 (2, 2, '2026-11-09 13:00:00', '2026-11-09 14:30:00', 10000);
