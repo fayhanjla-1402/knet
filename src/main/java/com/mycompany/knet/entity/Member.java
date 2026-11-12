@@ -3,7 +3,6 @@ package com.mycompany.knet.entity;
 import java.sql.Date;
 
 public class Member {
-
     private int idMember;
     private String nama;
     private String noHp;
