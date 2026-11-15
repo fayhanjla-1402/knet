@@ -16,7 +16,7 @@ public class SesiRepository {
     private Connection koneksi;
 
     public SesiRepository() {
-        this.koneksi = Koneksi.getKoneksi();
+        this.koneksi = DatabaseUtil.getKoneksi();
     }
 
     // Status komputer diubah otomatis oleh trigger trgSesiMulai.

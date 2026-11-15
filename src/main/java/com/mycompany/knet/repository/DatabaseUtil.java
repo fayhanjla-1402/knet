@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Koneksi {
+public class DatabaseUtil {
     private static String url = "jdbc:mysql://localhost:3306/db_knet";
     private static String user = "root";
     private static String password = "";
@@ -21,5 +21,9 @@ public class Koneksi {
         }
 
         return koneksi;
+    }
+
+    static Connection getConnection() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

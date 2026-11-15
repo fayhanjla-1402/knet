@@ -1,168 +1,159 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.knet.repository;
 
-/**
- *
- * @author Vivob
- */
-import com.mycompany.knet.entity.Komputer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
- 
-public class KomputerRepository { 
-    private Connection koneksi;
- 
-    public KomputerRepository() {
-        this.koneksi = Koneksi.getKoneksi();
-    }
- 
-    public boolean simpanData(Komputer komputer) {
-        String sql = "INSERT INTO komputer (namaKomputer, tarifPerJam, status) VALUES (?, ?, ?)";
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, komputer.getNamaKomputer());
-            ps.setInt(2, komputer.getTarifPerJam());
-            ps.setString(3, komputer.getStatus());
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+import com.mycompany.knet.entity.Komputer;
+import com.mycompany.knet.model.KomputerModel;
+
+public class KomputerRepository {
+
+    public List<KomputerModel> getAllKomputer() {
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM komputer ORDER BY idKomputer");
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            return bacaDaftarKomputer(rs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
         }
     }
- 
-    public boolean ubahData(Komputer komputer) {
-        String sql = "UPDATE komputer SET namaKomputer = ?, tarifPerJam = ?, status = ? WHERE idKomputer = ?";
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, komputer.getNamaKomputer());
-            ps.setInt(2, komputer.getTarifPerJam());
-            ps.setString(3, komputer.getStatus());
-            ps.setInt(4, komputer.getIdKomputer());
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
- 
-    public boolean hapusData(int idKomputer) {
-        String sql = "DELETE FROM komputer WHERE idKomputer = ?";
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setInt(1, idKomputer);
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
- 
-    public boolean ubahStatus(int idKomputer, String status) {
-        String sql = "UPDATE komputer SET status = ? WHERE idKomputer = ?";
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, status);
-            ps.setInt(2, idKomputer);
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
- 
-    public List<Komputer> ambilSemuaData() {
-        String sql = "SELECT * FROM komputer ORDER BY idKomputer";
-        List<Komputer> daftarKomputer = new ArrayList<Komputer>();
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
- 
-            while (rs.next()) {
-                Komputer komputer = buatKomputer(rs);
-                daftarKomputer.add(komputer);
-            }
- 
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
- 
-        return daftarKomputer;
-    }
- 
-    public List<Komputer> ambilKomputerTersedia() {
+
+    public List<KomputerModel> getKomputerTersedia() {
         String sql = "SELECT * FROM komputer WHERE status = 'Tersedia' ORDER BY idKomputer";
-        List<Komputer> daftarKomputer = new ArrayList<Komputer>();
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
- 
-            while (rs.next()) {
-                Komputer komputer = buatKomputer(rs);
-                daftarKomputer.add(komputer);
-            }
- 
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            return bacaDaftarKomputer(rs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
         }
- 
-        return daftarKomputer;
     }
- 
-    public List<Komputer> cariData(String kataKunci) {
+
+    public List<KomputerModel> searchKomputer(String keyword) {
         String sql = "SELECT * FROM komputer WHERE namaKomputer LIKE ? ORDER BY idKomputer";
-        List<Komputer> daftarKomputer = new ArrayList<Komputer>();
- 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, "%" + kataKunci + "%");
-            ResultSet rs = ps.executeQuery();
- 
-            while (rs.next()) {
-                Komputer komputer = buatKomputer(rs);
-                daftarKomputer.add(komputer);
-            }
- 
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, "%" + keyword + "%");
+
+            ResultSet rs = stmt.executeQuery();
+            List<KomputerModel> daftarKomputer = bacaDaftarKomputer(rs);
             rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+            return daftarKomputer;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
         }
- 
-        return daftarKomputer;
     }
- 
-    private Komputer buatKomputer(ResultSet rs) throws SQLException {
-        Komputer komputer = new Komputer();
-        komputer.setIdKomputer(rs.getInt("idKomputer"));
-        komputer.setNamaKomputer(rs.getString("namaKomputer"));
-        komputer.setTarifPerJam(rs.getInt("tarifPerJam"));
-        komputer.setStatus(rs.getString("status"));
-        return komputer;
+
+    public void addKomputer(Komputer komputer) {
+        String sql = "INSERT INTO komputer (namaKomputer, tarifPerJam) VALUES (?, ?)";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, komputer.getNamaKomputer());
+            stmt.setInt(2, komputer.getTarifPerJam());
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal menyimpan data komputer, nama komputer mungkin sudah dipakai!");
+        }
+    }
+
+    public void updateKomputer(Komputer komputer) {
+        String sql = "UPDATE komputer SET namaKomputer = ?, tarifPerJam = ? WHERE idKomputer = ?";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, komputer.getNamaKomputer());
+            stmt.setInt(2, komputer.getTarifPerJam());
+            stmt.setInt(3, komputer.getIdKomputer());
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal mengubah data komputer, nama komputer mungkin sudah dipakai!");
+        }
+    }
+
+    public void updateStatusKomputer(int idKomputer, String status) {
+        String sqlCek = "SELECT COUNT(*) FROM sesi WHERE idKomputer = ? AND jamSelesai IS NULL";
+        String sqlUbah = "UPDATE komputer SET status = ? WHERE idKomputer = ?";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmtCek = conn.prepareStatement(sqlCek);
+                PreparedStatement stmtUbah = conn.prepareStatement(sqlUbah)
+        ) {
+            stmtCek.setInt(1, idKomputer);
+            ResultSet rs = stmtCek.executeQuery();
+            int jumlahSesiBerjalan = 0;
+
+            if (rs.next()) {
+                jumlahSesiBerjalan = rs.getInt(1);
+            }
+
+            rs.close();
+
+            if (jumlahSesiBerjalan > 0 && status.equals("Tersedia")) {
+                throw new RuntimeException("Komputer ini masih punya sesi berjalan, akhiri sesinya dulu!");
+            }
+
+            stmtUbah.setString(1, status);
+            stmtUbah.setInt(2, idKomputer);
+            stmtUbah.executeUpdate();
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal mengubah status komputer!");
+        }
+    }
+
+    public void deleteKomputer(int idKomputer) {
+        String sql = "DELETE FROM komputer WHERE idKomputer = ?";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, idKomputer);
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal menghapus komputer, komputer ini sudah tercatat di data sesi!");
+        }
+    }
+
+    private List<KomputerModel> bacaDaftarKomputer(ResultSet rs) throws SQLException {
+        List<KomputerModel> daftarKomputer = new ArrayList<>();
+
+        while (rs.next()) {
+            int idKomputer = rs.getInt("idKomputer");
+            String namaKomputer = rs.getString("namaKomputer");
+            int tarifPerJam = rs.getInt("tarifPerJam");
+            String status = rs.getString("status");
+
+            KomputerModel komputerModel = new KomputerModel(idKomputer, namaKomputer, tarifPerJam, status);
+            daftarKomputer.add(komputerModel);
+        }
+
+        return daftarKomputer;
     }
 }
- 

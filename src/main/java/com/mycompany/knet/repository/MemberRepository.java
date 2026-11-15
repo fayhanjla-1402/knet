@@ -7,116 +7,105 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import com.mycompany.knet.entity.Member;
+import com.mycompany.knet.model.MemberModel;
 
 public class MemberRepository {
 
-    private Connection koneksi;
-
-    public MemberRepository() {
-        this.koneksi = Koneksi.getKoneksi();
-    }
-
-    public boolean simpanData(Member member) {
-        String sql = "INSERT INTO member (nama, noHp, tanggalDaftar) VALUES (?, ?, ?)";
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, member.getNama());
-            ps.setString(2, member.getNoHp());
-            ps.setDate(3, member.getTanggalDaftar());
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+    public List<MemberModel> getAllMembers() {
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM member ORDER BY idMember");
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            return bacaDaftarMember(rs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
         }
     }
 
-    public boolean ubahData(Member member) {
+    public List<MemberModel> searchMembers(String keyword) {
+        String sql = "SELECT * FROM member WHERE nama LIKE ? OR noHp LIKE ? ORDER BY idMember";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, "%" + keyword + "%");
+            stmt.setString(2, "%" + keyword + "%");
+
+            ResultSet rs = stmt.executeQuery();
+            List<MemberModel> members = bacaDaftarMember(rs);
+            rs.close();
+
+            return members;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
+        }
+    }
+
+    public void addMember(Member member) {
+        String sql = "INSERT INTO member (nama, noHp, tanggalDaftar) VALUES (?, ?, CURDATE())";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, member.getNama());
+            stmt.setString(2, member.getNoHp());
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal menyimpan data member!");
+        }
+    }
+
+    public void updateMember(Member member) {
         String sql = "UPDATE member SET nama = ?, noHp = ? WHERE idMember = ?";
 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, member.getNama());
-            ps.setString(2, member.getNoHp());
-            ps.setInt(3, member.getIdMember());
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, member.getNama());
+            stmt.setString(2, member.getNoHp());
+            stmt.setInt(3, member.getIdMember());
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal mengubah data member!");
         }
     }
 
-    public boolean hapusData(int idMember) {
+    public void deleteMember(int idMember) {
         String sql = "DELETE FROM member WHERE idMember = ?";
 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setInt(1, idMember);
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, idMember);
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal menghapus member, member ini sudah tercatat di data sesi!");
         }
     }
 
-    public List<Member> ambilSemuaData() {
-        String sql = "SELECT * FROM member ORDER BY idMember";
-        List<Member> daftarMember = new ArrayList<Member>();
+    private List<MemberModel> bacaDaftarMember(ResultSet rs) throws SQLException {
+        List<MemberModel> members = new ArrayList<>();
 
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            int idMember = rs.getInt("idMember");
+            String nama = rs.getString("nama");
+            String noHp = rs.getString("noHp");
+            java.sql.Date tanggalDaftar = rs.getDate("tanggalDaftar");
 
-            while (rs.next()) {
-                Member member = buatMember(rs);
-                daftarMember.add(member);
-            }
-
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            MemberModel memberModel = new MemberModel(idMember, nama, noHp, tanggalDaftar);
+            members.add(memberModel);
         }
 
-        return daftarMember;
-    }
-
-    public List<Member> cariData(String kataKunci) {
-        String sql = "SELECT * FROM member WHERE nama LIKE ? OR noHp LIKE ? ORDER BY idMember";
-        List<Member> daftarMember = new ArrayList<Member>();
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setString(1, "%" + kataKunci + "%");
-            ps.setString(2, "%" + kataKunci + "%");
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Member member = buatMember(rs);
-                daftarMember.add(member);
-            }
-
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return daftarMember;
-    }
-
-    private Member buatMember(ResultSet rs) throws SQLException {
-        Member member = new Member();
-        member.setIdMember(rs.getInt("idMember"));
-        member.setNama(rs.getString("nama"));
-        member.setNoHp(rs.getString("noHp"));
-        member.setTanggalDaftar(rs.getDate("tanggalDaftar"));
-        return member;
+        return members;
     }
 }
