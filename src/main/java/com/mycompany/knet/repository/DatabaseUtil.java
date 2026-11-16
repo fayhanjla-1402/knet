@@ -1,3 +1,4 @@
+
 package com.mycompany.knet.repository;
 
 import java.sql.Connection;
@@ -17,13 +18,12 @@ public class DatabaseUtil {
             }
         } catch (SQLException e) {
             System.err.println("Gagal terhubung ke database: " + e.getMessage());
-            e.printStackTrace();
         }
 
         return koneksi;
     }
 
-    static Connection getConnection() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public static Connection getConnection() {
+        return getKoneksi();
     }
 }

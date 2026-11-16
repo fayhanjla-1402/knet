@@ -4,6 +4,12 @@
  */
 package com.mycompany.knet.view;
 
+import com.mycompany.knet.model.MemberModel;
+import com.mycompany.knet.repository.MemberRepository;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Vivob
@@ -11,12 +17,26 @@ package com.mycompany.knet.view;
 public class FormMember extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormMember.class.getName());
-
+    private MemberRepository mr = new MemberRepository();
     /**
      * Creates new form FormKomputer
      */
     public FormMember() {
         initComponents();
+        
+        renderTable(mr.getAllMembers());
+
+        jtMember.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int baris = jtMember.getSelectedRow();
+
+                if (baris != -1) {
+                    tfNama.setText(jtMember.getValueAt(baris, 1).toString());
+                    tfNo.setText(jtMember.getValueAt(baris, 2).toString());
+                    tfTgl.setText(jtMember.getValueAt(baris, 3).toString());
+                }
+            }
+        });
     }
 
     /**
@@ -28,10 +48,6 @@ public class FormMember extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        BtnKomp = new javax.swing.JButton();
-        BtnSesi = new javax.swing.JButton();
-        BtnLaporan = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         nmMember = new javax.swing.JLabel();
@@ -52,40 +68,47 @@ public class FormMember extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jtMember = new javax.swing.JTable();
         jScrollBar1 = new javax.swing.JScrollBar();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        BtnKomp = new javax.swing.JButton();
+        BtnSesi = new javax.swing.JButton();
+        BtnLaporan = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
-        jLabel1.setText("KNET");
-
-        BtnKomp.setText("Daftar Komputer");
-        BtnKomp.addActionListener(this::BtnKompActionPerformed);
-
-        BtnSesi.setText("Daftar Sesi");
-        BtnSesi.addActionListener(this::BtnSesiActionPerformed);
-
-        BtnLaporan.setText("Laporan");
-        BtnLaporan.addActionListener(this::BtnLaporanActionPerformed);
+        jPanel2.setBackground(new java.awt.Color(102, 102, 183));
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel6.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Daftar Member");
 
+        nmMember.setForeground(new java.awt.Color(255, 255, 255));
         nmMember.setText("Nama");
 
+        noMember.setForeground(new java.awt.Color(255, 255, 255));
         noMember.setText("No HP");
 
+        tglMember.setForeground(new java.awt.Color(255, 255, 255));
         tglMember.setText("Tanggal Daftar");
 
         tfNama.addActionListener(this::tfNamaActionPerformed);
 
         tfTgl.setEnabled(false);
 
+        BtnSimpan.setBackground(new java.awt.Color(255, 255, 226));
+        BtnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnSimpan.setText("Simpan");
         BtnSimpan.addActionListener(this::BtnSimpanActionPerformed);
 
+        BtnUbah.setBackground(new java.awt.Color(255, 255, 226));
+        BtnUbah.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnUbah.setText("Ubah");
         BtnUbah.addActionListener(this::BtnUbahActionPerformed);
 
+        BtnHapus.setBackground(new java.awt.Color(255, 255, 226));
+        BtnHapus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnHapus.setText("Hapus");
         BtnHapus.addActionListener(this::BtnHapusActionPerformed);
 
@@ -111,15 +134,15 @@ public class FormMember extends javax.swing.JFrame {
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(nmMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(23, 23, 23)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(noMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(6, 6, 6)
+                                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(noMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(tglMember, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap(27, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,12 +167,23 @@ public class FormMember extends javax.swing.JFrame {
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        jLabel10.setFont(new java.awt.Font("Gadugi", 0, 12)); // NOI18N
+        jPanel1.setBackground(new java.awt.Color(255, 255, 226));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel10.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
         jLabel10.setText("Cari Member");
 
+        tfCari.addActionListener(this::tfCariActionPerformed);
+
+        BtnCari.setBackground(new java.awt.Color(91, 91, 163));
+        BtnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnCari.setForeground(new java.awt.Color(255, 255, 255));
         BtnCari.setText("Cari");
         BtnCari.addActionListener(this::BtnCariActionPerformed);
 
+        BtnTampil.setBackground(new java.awt.Color(91, 91, 163));
+        BtnTampil.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnTampil.setForeground(new java.awt.Color(255, 255, 255));
         BtnTampil.setText("Tampilkan Semua");
         BtnTampil.addActionListener(this::BtnTampilActionPerformed);
 
@@ -174,6 +208,10 @@ public class FormMember extends javax.swing.JFrame {
         });
         jtMember.setColumnSelectionAllowed(true);
         jScrollPane2.setViewportView(jtMember);
+        jtMember.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        if (jtMember.getColumnModel().getColumnCount() > 0) {
+            jtMember.getColumnModel().getColumn(0).setPreferredWidth(2);
+        }
 
         jDesktopPane1.setLayer(jScrollPane2, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jDesktopPane1.setLayer(jScrollBar1, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -183,8 +221,7 @@ public class FormMember extends javax.swing.JFrame {
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -193,10 +230,9 @@ public class FormMember extends javax.swing.JFrame {
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE))
-                .addContainerGap())
+                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -206,17 +242,17 @@ public class FormMember extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(tfCari, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BtnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BtnTampil)))))
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(tfCari)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(BtnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(BtnTampil))
+                        .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -229,9 +265,65 @@ public class FormMember extends javax.swing.JFrame {
                     .addComponent(tfCari, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(BtnCari)
                     .addComponent(BtnTampil))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 226));
+        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel1.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(45, 45, 163));
+        jLabel1.setText("KNET");
+
+        BtnKomp.setBackground(new java.awt.Color(91, 91, 163));
+        BtnKomp.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnKomp.setForeground(new java.awt.Color(255, 255, 255));
+        BtnKomp.setText("Daftar Komputer");
+        BtnKomp.addActionListener(this::BtnKompActionPerformed);
+
+        BtnSesi.setBackground(new java.awt.Color(91, 91, 163));
+        BtnSesi.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnSesi.setForeground(new java.awt.Color(255, 255, 255));
+        BtnSesi.setText("Daftar Sesi");
+        BtnSesi.addActionListener(this::BtnSesiActionPerformed);
+
+        BtnLaporan.setBackground(new java.awt.Color(91, 91, 163));
+        BtnLaporan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnLaporan.setForeground(new java.awt.Color(255, 255, 255));
+        BtnLaporan.setText("Laporan");
+        BtnLaporan.addActionListener(this::BtnLaporanActionPerformed);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(BtnKomp)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BtnSesi, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BtnLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BtnKomp)
+                    .addComponent(BtnSesi)
+                    .addComponent(BtnLaporan))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -239,49 +331,40 @@ public class FormMember extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BtnKomp)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BtnSesi, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BtnLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(BtnKomp)
-                    .addComponent(BtnSesi)
-                    .addComponent(BtnLaporan))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void BtnKompActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnKompActionPerformed
-        // TODO add your handling code here:
+        FormKomputer formKomputer = new FormKomputer();
+        formKomputer.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_BtnKompActionPerformed
 
     private void BtnSesiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSesiActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_BtnSesiActionPerformed
 
     private void BtnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLaporanActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_BtnLaporanActionPerformed
 
     private void tfNamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaActionPerformed
@@ -289,25 +372,131 @@ public class FormMember extends javax.swing.JFrame {
     }//GEN-LAST:event_tfNamaActionPerformed
 
     private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSimpanActionPerformed
-        // TODO add your handling code here:
+        String nama = tfNama.getText().trim();
+        String noHp = tfNo.getText().trim();
+
+        if (nama.isEmpty() || noHp.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nama dan nomor HP harus diisi!");
+        } else {
+            try {
+                MemberModel member = new MemberModel(0, nama, noHp, null);
+                mr.addMember(member);
+
+                JOptionPane.showMessageDialog(this, "Data member berhasil disimpan!");
+                clearForm();
+                renderTable(mr.getAllMembers());
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
+        }
     }//GEN-LAST:event_BtnSimpanActionPerformed
 
     private void BtnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnUbahActionPerformed
-        // TODO add your handling code here:
+        int baris = jtMember.getSelectedRow();
+
+        if (baris == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data member terlebih dahulu!");
+        } else {
+            String nama = tfNama.getText().trim();
+            String noHp = tfNo.getText().trim();
+
+            if (nama.isEmpty() || noHp.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nama dan nomor HP harus diisi!");
+            } else {
+                try {
+                    int idMember = Integer.parseInt(jtMember.getValueAt(baris, 0).toString());
+
+                    MemberModel member = new MemberModel(idMember, nama, noHp, null);
+                    mr.updateMember(member);
+
+                    JOptionPane.showMessageDialog(this, "Data member berhasil diubah!");
+                    clearForm();
+                    renderTable(mr.getAllMembers());
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+            }
+        }
     }//GEN-LAST:event_BtnUbahActionPerformed
 
     private void BtnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnHapusActionPerformed
-        // TODO add your handling code here:
+        int baris = jtMember.getSelectedRow();
+
+        if (baris == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data member terlebih dahulu!");
+        } else {
+            int konfirmasi = JOptionPane.showConfirmDialog(
+                    this,
+                    "Apakah Anda yakin ingin menghapus member ini?",
+                    "Konfirmasi Hapus",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (konfirmasi == JOptionPane.YES_OPTION) {
+                try {
+                    int idMember = Integer.parseInt(jtMember.getValueAt(baris, 0).toString());
+
+                    mr.deleteMember(idMember);
+
+                    JOptionPane.showMessageDialog(this, "Data member berhasil dihapus!");
+                    clearForm();
+                    renderTable(mr.getAllMembers());
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+            }
+        }
     }//GEN-LAST:event_BtnHapusActionPerformed
 
     private void BtnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCariActionPerformed
-        // TODO add your handling code here:
+        String keyword = tfCari.getText().trim();
+
+        if (keyword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Masukkan nama atau nomor HP yang ingin dicari!");
+        } else {
+            List<MemberModel> daftarMember = mr.searchMembers(keyword);
+
+            renderTable(daftarMember);
+
+            if (daftarMember.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Data member tidak ditemukan!");
+            }
+        }
     }//GEN-LAST:event_BtnCariActionPerformed
 
     private void BtnTampilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTampilActionPerformed
-        // TODO add your handling code here:
+        renderTable(mr.getAllMembers());
+        clearForm();
     }//GEN-LAST:event_BtnTampilActionPerformed
 
+    private void tfCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfCariActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfCariActionPerformed
+
+    private void renderTable(List<MemberModel> daftarMember) {
+        DefaultTableModel model = (DefaultTableModel) jtMember.getModel();
+        model.setRowCount(0);
+
+        for (MemberModel member : daftarMember) {
+            model.addRow(new Object[]{
+                member.getIdMember(),
+                member.getNama(),
+                member.getNoHp(),
+                member.getTanggalDaftar()
+            });
+        }
+    }
+    
+    private void clearForm() {
+        tfNama.setText("");
+        tfNo.setText("");
+        tfTgl.setText("");
+        tfCari.setText("");
+        jtMember.clearSelection();
+    }
     /**
      * @param args the command line arguments
      */
@@ -348,6 +537,7 @@ public class FormMember extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jtMember;

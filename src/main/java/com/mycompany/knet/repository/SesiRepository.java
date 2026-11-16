@@ -1,174 +1,174 @@
 package com.mycompany.knet.repository;
 
+import com.mycompany.knet.model.SesiModel;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import com.mycompany.knet.entity.Sesi;
 
 public class SesiRepository {
-
-    private Connection koneksi;
-
-    public SesiRepository() {
-        this.koneksi = DatabaseUtil.getKoneksi();
-    }
-
-    // Status komputer diubah otomatis oleh trigger trgSesiMulai.
-    // Trigger trgSesiCekKomputer menolak sesi baru jika komputer masih Dipakai.
-    public boolean mulaiSesi(int idMember, int idKomputer) {
-        String sql = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setInt(1, idMember);
-            ps.setInt(2, idKomputer);
-            ps.executeUpdate();
-            ps.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+    public List<SesiModel> getAllSesi() {
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM vRiwayatSesi ORDER BY idSesi DESC");
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            return bacaDaftarSesi(rs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
         }
     }
 
-    // Jam selesai, total biaya, dan status komputer dihitung di database
-    // lewat stored procedure spAkhiriSesi dan trigger trgSesiSelesai.
-    // Mengembalikan total biaya, atau -1 jika gagal.
-    public int akhiriSesi(int idSesi) {
+    public List<SesiModel> getSesiBerjalan() {
+        String sql = "SELECT * FROM vRiwayatSesi WHERE jamSelesai IS NULL ORDER BY idSesi";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            return bacaDaftarSesi(rs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
+        }
+    }
+
+    public List<SesiModel> getSesiByTanggal(Date tanggal) {
+        String sql = "SELECT * FROM vRiwayatSesi WHERE DATE(jamMulai) = ? ORDER BY idSesi DESC";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setDate(1, tanggal);
+
+            ResultSet rs = stmt.executeQuery();
+            List<SesiModel> daftarSesi = bacaDaftarSesi(rs);
+            rs.close();
+
+            return daftarSesi;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return List.of();
+        }
+    }
+
+    public int getTotalPendapatan() {
+        String sql = "SELECT SUM(totalBiaya) FROM sesi WHERE jamSelesai IS NOT NULL";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int getPendapatanByTanggal(Date tanggal) {
+        String sql = "SELECT SUM(totalBiaya) FROM sesi WHERE DATE(jamMulai) = ? AND jamSelesai IS NOT NULL";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setDate(1, tanggal);
+
+            ResultSet rs = stmt.executeQuery();
+            int totalPendapatan = 0;
+
+            if (rs.next()) {
+                totalPendapatan = rs.getInt(1);
+            }
+
+            rs.close();
+            return totalPendapatan;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
+    public void addSesi(SesiModel sesi) {
+        String sql = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, sesi.getIdMember());
+            stmt.setInt(2, sesi.getIdKomputer());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+            if ("45000".equals(ex.getSQLState())) {
+                throw new RuntimeException(ex.getMessage());
+            }
+
+            throw new RuntimeException("Gagal memulai sesi!");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal memulai sesi!");
+        }
+    }
+
+    public int finishSesi(int idSesi) {
+        String sql = "{CALL spAkhiriSesi(?, ?)}";
         int totalBiaya = -1;
 
-        try {
-            CallableStatement cs = koneksi.prepareCall("{CALL spAkhiriSesi(?, ?)}");
-            cs.setInt(1, idSesi);
-            cs.registerOutParameter(2, Types.INTEGER);
-            cs.execute();
-            totalBiaya = cs.getInt(2);
-            cs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                CallableStatement stmt = conn.prepareCall(sql)
+        ) {
+            stmt.setInt(1, idSesi);
+            stmt.registerOutParameter(2, Types.INTEGER);
+            stmt.execute();
+            totalBiaya = stmt.getInt(2);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal mengakhiri sesi!");
+        }
+
+        if (totalBiaya < 0) {
+            throw new RuntimeException("Sesi tidak ditemukan atau sudah selesai");
         }
 
         return totalBiaya;
     }
 
-    public List<Sesi> ambilSesiBerjalan() {
-        String sql = "SELECT * FROM vRiwayatSesi WHERE jamSelesai IS NULL ORDER BY idSesi";
-        List<Sesi> daftarSesi = new ArrayList<Sesi>();
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            daftarSesi = bacaDaftarSesi(ps);
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return daftarSesi;
-    }
-
-    public List<Sesi> ambilRiwayat() {
-        String sql = "SELECT * FROM vRiwayatSesi ORDER BY idSesi DESC";
-        List<Sesi> daftarSesi = new ArrayList<Sesi>();
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            daftarSesi = bacaDaftarSesi(ps);
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return daftarSesi;
-    }
-
-    public List<Sesi> ambilRiwayatPerTanggal(Date tanggal) {
-        String sql = "SELECT * FROM vRiwayatSesi WHERE DATE(jamMulai) = ? ORDER BY idSesi DESC";
-        List<Sesi> daftarSesi = new ArrayList<Sesi>();
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setDate(1, tanggal);
-            daftarSesi = bacaDaftarSesi(ps);
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return daftarSesi;
-    }
-
-    public int ambilPendapatanPerTanggal(Date tanggal) {
-        String sql = "SELECT SUM(totalBiaya) FROM sesi WHERE DATE(jamMulai) = ? AND jamSelesai IS NOT NULL";
-        int totalPendapatan = 0;
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            ps.setDate(1, tanggal);
-            totalPendapatan = bacaAngka(ps);
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return totalPendapatan;
-    }
-
-    public int ambilPendapatanTotal() {
-        String sql = "SELECT SUM(totalBiaya) FROM sesi WHERE jamSelesai IS NOT NULL";
-        int totalPendapatan = 0;
-
-        try {
-            PreparedStatement ps = koneksi.prepareStatement(sql);
-            totalPendapatan = bacaAngka(ps);
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return totalPendapatan;
-    }
-
-    private List<Sesi> bacaDaftarSesi(PreparedStatement ps) throws SQLException {
-        List<Sesi> daftarSesi = new ArrayList<Sesi>();
-        ResultSet rs = ps.executeQuery();
+    private List<SesiModel> bacaDaftarSesi(ResultSet rs) throws SQLException {
+        List<SesiModel> daftarSesi = new ArrayList<>();
 
         while (rs.next()) {
-            Sesi sesi = buatSesi(rs);
-            daftarSesi.add(sesi);
+            int idSesi = rs.getInt("idSesi");
+            int idMember = rs.getInt("idMember");
+            String namaMember = rs.getString("namaMember");
+            int idKomputer = rs.getInt("idKomputer");
+            String namaKomputer = rs.getString("namaKomputer");
+            Timestamp jamMulai = rs.getTimestamp("jamMulai");
+            Timestamp jamSelesai = rs.getTimestamp("jamSelesai");
+            int totalBiaya = rs.getInt("totalBiaya");
+
+            SesiModel sesiModel = new SesiModel(idSesi, idMember, namaMember, idKomputer, namaKomputer, jamMulai, jamSelesai, totalBiaya);
+            daftarSesi.add(sesiModel);
         }
 
-        rs.close();
         return daftarSesi;
-    }
-
-    private int bacaAngka(PreparedStatement ps) throws SQLException {
-        int angka = 0;
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            angka = rs.getInt(1);
-        }
-
-        rs.close();
-        return angka;
-    }
-
-    private Sesi buatSesi(ResultSet rs) throws SQLException {
-        Sesi sesi = new Sesi();
-        sesi.setIdSesi(rs.getInt("idSesi"));
-        sesi.setIdMember(rs.getInt("idMember"));
-        sesi.setIdKomputer(rs.getInt("idKomputer"));
-        sesi.setNamaMember(rs.getString("namaMember"));
-        sesi.setNamaKomputer(rs.getString("namaKomputer"));
-        sesi.setJamMulai(rs.getTimestamp("jamMulai"));
-        sesi.setJamSelesai(rs.getTimestamp("jamSelesai"));
-        sesi.setTotalBiaya(rs.getInt("totalBiaya"));
-        return sesi;
     }
 }

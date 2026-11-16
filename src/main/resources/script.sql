@@ -118,6 +118,3 @@ DELIMITER ;
 INSERT INTO sesi (idMember, idKomputer, jamMulai, jamSelesai, totalBiaya) VALUES
 (1, 1, '2026-11-09 10:00:00', '2026-11-09 12:00:00', 10000),
 (2, 2, '2026-11-09 13:00:00', '2026-11-09 14:30:00', 10000);
-
-INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES
-(3, 3, '2026-11-10 09:00:00');

@@ -1,16 +1,14 @@
 package com.mycompany.knet.repository;
 
+import com.mycompany.knet.model.KomputerModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import com.mycompany.knet.entity.Komputer;
-import com.mycompany.knet.model.KomputerModel;
 
 public class KomputerRepository {
-
     public List<KomputerModel> getAllKomputer() {
         try (
                 Connection conn = DatabaseUtil.getConnection();
@@ -59,7 +57,7 @@ public class KomputerRepository {
         }
     }
 
-    public void addKomputer(Komputer komputer) {
+    public void addKomputer(KomputerModel komputer) {
         String sql = "INSERT INTO komputer (namaKomputer, tarifPerJam) VALUES (?, ?)";
 
         try (
@@ -75,7 +73,7 @@ public class KomputerRepository {
         }
     }
 
-    public void updateKomputer(Komputer komputer) {
+    public void updateKomputer(KomputerModel komputer) {
         String sql = "UPDATE komputer SET namaKomputer = ?, tarifPerJam = ? WHERE idKomputer = ?";
 
         try (

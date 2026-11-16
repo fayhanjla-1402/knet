@@ -1,16 +1,14 @@
 package com.mycompany.knet.repository;
 
+import com.mycompany.knet.model.MemberModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import com.mycompany.knet.entity.Member;
-import com.mycompany.knet.model.MemberModel;
 
 public class MemberRepository {
-
     public List<MemberModel> getAllMembers() {
         try (
                 Connection conn = DatabaseUtil.getConnection();
@@ -45,7 +43,7 @@ public class MemberRepository {
         }
     }
 
-    public void addMember(Member member) {
+    public void addMember(MemberModel member) {
         String sql = "INSERT INTO member (nama, noHp, tanggalDaftar) VALUES (?, ?, CURDATE())";
 
         try (
@@ -61,7 +59,7 @@ public class MemberRepository {
         }
     }
 
-    public void updateMember(Member member) {
+    public void updateMember(MemberModel member) {
         String sql = "UPDATE member SET nama = ?, noHp = ? WHERE idMember = ?";
 
         try (

@@ -4,6 +4,11 @@
  */
 package com.mycompany.knet.view;
 
+import com.mycompany.knet.model.KomputerModel;
+import com.mycompany.knet.repository.KomputerRepository;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Vivob
@@ -11,12 +16,24 @@ package com.mycompany.knet.view;
 public class FormKomputer extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormKomputer.class.getName());
-
+    private KomputerRepository kr = new KomputerRepository();
     /**
      * Creates new form FormKomputer
      */
     public FormKomputer() {
         initComponents();
+        renderTable(kr.getAllKomputer());
+        
+        jtKomputer.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int baris = jtKomputer.getSelectedRow();
+
+                if (baris != -1) {
+                    tfKode.setText(jtKomputer.getValueAt(baris, 1).toString());
+                    tfTarif.setText(jtKomputer.getValueAt(baris, 2).toString());
+                }
+            }
+        });
     }
 
     /**
@@ -28,15 +45,13 @@ public class FormKomputer extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        BtnLaporan = new javax.swing.JButton();
+        BtnKembali = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        nmMember = new javax.swing.JLabel();
-        noMember = new javax.swing.JLabel();
-        tglMember = new javax.swing.JLabel();
-        tfNama = new javax.swing.JTextField();
-        tfNo = new javax.swing.JTextField();
-        tfTgl = new javax.swing.JTextField();
+        kdKomputer = new javax.swing.JLabel();
+        tarif = new javax.swing.JLabel();
+        tfKode = new javax.swing.JTextField();
+        tfTarif = new javax.swing.JTextField();
         BtnSimpan = new javax.swing.JButton();
         BtnUbah = new javax.swing.JButton();
         BtnHapus = new javax.swing.JButton();
@@ -47,33 +62,46 @@ public class FormKomputer extends javax.swing.JFrame {
         BtnTampil = new javax.swing.JButton();
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jtMember = new javax.swing.JTable();
+        jtKomputer = new javax.swing.JTable();
         jScrollBar1 = new javax.swing.JScrollBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        BtnLaporan.setText("Laporan");
-        BtnLaporan.addActionListener(this::BtnLaporanActionPerformed);
+        BtnKembali.setBackground(new java.awt.Color(255, 255, 226));
+        BtnKembali.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnKembali.setForeground(new java.awt.Color(91, 91, 163));
+        BtnKembali.setText("Kembali");
+        BtnKembali.addActionListener(this::BtnKembaliActionPerformed);
+
+        jPanel2.setBackground(new java.awt.Color(99, 99, 178));
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel6.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
-        jLabel6.setText("Daftar Member");
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("Daftar Komputer");
 
-        nmMember.setText("Nama");
+        kdKomputer.setForeground(new java.awt.Color(255, 255, 255));
+        kdKomputer.setText("Kode Komputer");
 
-        noMember.setText("No HP");
+        tarif.setForeground(new java.awt.Color(255, 255, 255));
+        tarif.setText("Tarif Per Jam");
 
-        tglMember.setText("Tanggal Daftar");
+        tfKode.addActionListener(this::tfKodeActionPerformed);
 
-        tfNama.addActionListener(this::tfNamaActionPerformed);
+        tfTarif.addActionListener(this::tfTarifActionPerformed);
 
-        tfTgl.setEnabled(false);
-
+        BtnSimpan.setBackground(new java.awt.Color(255, 255, 226));
+        BtnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnSimpan.setText("Simpan");
         BtnSimpan.addActionListener(this::BtnSimpanActionPerformed);
 
+        BtnUbah.setBackground(new java.awt.Color(255, 255, 226));
+        BtnUbah.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnUbah.setText("Ubah");
         BtnUbah.addActionListener(this::BtnUbahActionPerformed);
 
+        BtnHapus.setBackground(new java.awt.Color(255, 255, 226));
+        BtnHapus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnHapus.setText("Hapus");
         BtnHapus.addActionListener(this::BtnHapusActionPerformed);
 
@@ -88,6 +116,11 @@ public class FormKomputer extends javax.swing.JFrame {
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(tfKode, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(tfTarif)
+                        .addGap(27, 27, 27))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(BtnSimpan, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -96,18 +129,10 @@ public class FormKomputer extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(BtnHapus, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(nmMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(23, 23, 23)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(noMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(6, 6, 6)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(tglMember, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(kdKomputer)
+                                .addGap(174, 174, 174)
+                                .addComponent(tarif, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(156, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,14 +141,12 @@ public class FormKomputer extends javax.swing.JFrame {
                 .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(nmMember)
-                    .addComponent(noMember)
-                    .addComponent(tglMember))
+                    .addComponent(kdKomputer)
+                    .addComponent(tarif))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tfKode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfTarif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BtnSimpan)
@@ -132,16 +155,27 @@ public class FormKomputer extends javax.swing.JFrame {
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        jLabel10.setFont(new java.awt.Font("Gadugi", 0, 12)); // NOI18N
-        jLabel10.setText("Cari Member");
+        jPanel1.setBackground(new java.awt.Color(255, 255, 226));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        jLabel10.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
+        jLabel10.setText("Cari Komputer");
+
+        tfCari.addActionListener(this::tfCariActionPerformed);
+
+        BtnCari.setBackground(new java.awt.Color(91, 91, 163));
+        BtnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnCari.setForeground(new java.awt.Color(255, 255, 255));
         BtnCari.setText("Cari");
         BtnCari.addActionListener(this::BtnCariActionPerformed);
 
+        BtnTampil.setBackground(new java.awt.Color(91, 91, 163));
+        BtnTampil.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        BtnTampil.setForeground(new java.awt.Color(255, 255, 255));
         BtnTampil.setText("Tampilkan Semua");
         BtnTampil.addActionListener(this::BtnTampilActionPerformed);
 
-        jtMember.setModel(new javax.swing.table.DefaultTableModel(
+        jtKomputer.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -149,19 +183,23 @@ public class FormKomputer extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "ID", "Nama", "No HP", "Tanggal Daftar"
+                "ID", "Kode Komputer", "Tarif Per Jam", "Status"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
         });
-        jtMember.setColumnSelectionAllowed(true);
-        jScrollPane2.setViewportView(jtMember);
+        jtKomputer.setColumnSelectionAllowed(true);
+        jScrollPane2.setViewportView(jtKomputer);
+        jtKomputer.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        if (jtKomputer.getColumnModel().getColumnCount() > 0) {
+            jtKomputer.getColumnModel().getColumn(0).setPreferredWidth(2);
+        }
 
         jDesktopPane1.setLayer(jScrollPane2, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jDesktopPane1.setLayer(jScrollBar1, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -171,19 +209,17 @@ public class FormKomputer extends javax.swing.JFrame {
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -192,20 +228,17 @@ public class FormKomputer extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(tfCari, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BtnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BtnTampil)))))
-                .addContainerGap(26, Short.MAX_VALUE))
+                        .addComponent(tfCari, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BtnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BtnTampil, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -219,36 +252,38 @@ public class FormKomputer extends javax.swing.JFrame {
                     .addComponent(BtnTampil))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(445, Short.MAX_VALUE)
-                .addComponent(BtnLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(BtnKembali, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(BtnLaporan)
-                .addContainerGap(414, Short.MAX_VALUE))
+                .addComponent(BtnKembali)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(250, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(41, 41, 41)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGap(159, 159, 159)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
@@ -256,35 +291,170 @@ public class FormKomputer extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void BtnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLaporanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BtnLaporanActionPerformed
-
-    private void tfNamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfNamaActionPerformed
-
-    private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSimpanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BtnSimpanActionPerformed
-
-    private void BtnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnUbahActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BtnUbahActionPerformed
-
-    private void BtnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnHapusActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BtnHapusActionPerformed
+    private void BtnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnKembaliActionPerformed
+        FormMember formMember = new FormMember();
+        formMember.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_BtnKembaliActionPerformed
 
     private void BtnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCariActionPerformed
-        // TODO add your handling code here:
+        try {
+            String keyword = tfCari.getText().trim();
+
+            if (keyword.isEmpty()) {
+                throw new Exception("Masukkan nama komputer yang ingin dicari!");
+            }
+
+            List<KomputerModel> daftarKomputer = kr.searchKomputer(keyword);
+
+            renderTable(daftarKomputer);
+
+            if (daftarKomputer.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Komputer tidak ditemukan!");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }//GEN-LAST:event_BtnCariActionPerformed
 
     private void BtnTampilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTampilActionPerformed
-        // TODO add your handling code here:
+        try {
+        renderTable(kr.getAllKomputer());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }//GEN-LAST:event_BtnTampilActionPerformed
 
-    /**
+    private void BtnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnHapusActionPerformed
+        try {
+            int baris = jtKomputer.getSelectedRow();
+
+            if (baris == -1) {
+                throw new Exception("Pilih komputer yang ingin dihapus!");
+            }
+
+            int konfirmasi = JOptionPane.showConfirmDialog(
+                    this,
+                    "Apakah kamu yakin ingin menghapus komputer ini?",
+                    "Konfirmasi Hapus",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (konfirmasi == JOptionPane.YES_OPTION) {
+                int id = Integer.parseInt(jtKomputer.getValueAt(baris, 0).toString());
+
+                kr.deleteKomputer(id);
+
+                JOptionPane.showMessageDialog(this, "Data berhasil dihapus!");
+                BtnTampilActionPerformed(evt);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }//GEN-LAST:event_BtnHapusActionPerformed
+
+    private void BtnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnUbahActionPerformed
+        try {
+            int baris = jtKomputer.getSelectedRow();
+
+            if (baris == -1) {
+                throw new Exception("Pilih komputer yang ingin diubah!");
+            }
+
+            String nama = tfKode.getText().trim();
+            String tarifText = tfTarif.getText().trim();
+
+            if (nama.isEmpty() || tarifText.isEmpty()) {
+                throw new Exception("Data tidak boleh kosong!");
+            }
+
+            int tarif = Integer.parseInt(tarifText);
+
+            if (tarif <= 0) {
+                throw new Exception("Tarif harus lebih dari 0!");
+            }
+
+            int id = Integer.parseInt(jtKomputer.getValueAt(baris, 0).toString());
+            String status = jtKomputer.getValueAt(baris, 3).toString();
+
+            KomputerModel komputer = new KomputerModel(id, nama, tarif, status);
+
+            kr.updateKomputer(komputer);
+
+            JOptionPane.showMessageDialog(this, "Data berhasil diubah!");
+
+            tfKode.setText("");
+            tfTarif.setText("");
+
+            BtnTampilActionPerformed(evt);
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Tarif harus berupa angka!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }//GEN-LAST:event_BtnUbahActionPerformed
+
+    private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSimpanActionPerformed
+        try {
+            String nama = tfKode.getText().trim();
+            String tarifText = tfTarif.getText().trim();
+
+            if (nama.isEmpty() || tarifText.isEmpty()) {
+                throw new Exception("Data tidak boleh kosong!");
+            }
+
+            int tarif = Integer.parseInt(tarifText);
+
+            if (tarif <= 0) {
+                throw new Exception("Tarif harus lebih dari 0!");
+            }
+
+            KomputerModel komputer = new KomputerModel(0, nama, tarif, "Tersedia");
+            kr.addKomputer(komputer);
+
+            JOptionPane.showMessageDialog(this, "Data berhasil disimpan!");
+
+            tfKode.setText("");
+            tfTarif.setText("");
+
+            BtnTampilActionPerformed(evt);
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Tarif harus berupa angka!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }//GEN-LAST:event_BtnSimpanActionPerformed
+
+    private void tfKodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfKodeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfKodeActionPerformed
+
+    private void tfTarifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfTarifActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfTarifActionPerformed
+
+    private void tfCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfCariActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfCariActionPerformed
+
+    private void renderTable(List<KomputerModel> daftarKomputer) {
+        DefaultTableModel model = (DefaultTableModel) jtKomputer.getModel();
+        model.setRowCount(0);
+
+        for (KomputerModel komputer : daftarKomputer) {
+            model.addRow(new Object[]{
+                komputer.getIdKomputer(),
+                komputer.getNamaKomputer(),
+                komputer.getTarifPerJam(),
+                komputer.getStatus()
+            });
+        }
+    }
+        /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -312,7 +482,7 @@ public class FormKomputer extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnCari;
     private javax.swing.JButton BtnHapus;
-    private javax.swing.JButton BtnLaporan;
+    private javax.swing.JButton BtnKembali;
     private javax.swing.JButton BtnSimpan;
     private javax.swing.JButton BtnTampil;
     private javax.swing.JButton BtnUbah;
@@ -323,13 +493,11 @@ public class FormKomputer extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jtMember;
-    private javax.swing.JLabel nmMember;
-    private javax.swing.JLabel noMember;
+    private javax.swing.JTable jtKomputer;
+    private javax.swing.JLabel kdKomputer;
+    private javax.swing.JLabel tarif;
     private javax.swing.JTextField tfCari;
-    private javax.swing.JTextField tfNama;
-    private javax.swing.JTextField tfNo;
-    private javax.swing.JTextField tfTgl;
-    private javax.swing.JLabel tglMember;
+    private javax.swing.JTextField tfKode;
+    private javax.swing.JTextField tfTarif;
     // End of variables declaration//GEN-END:variables
 }
