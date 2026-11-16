@@ -6,9 +6,14 @@ package com.mycompany.knet.view;
 
 import com.mycompany.knet.model.KomputerModel;
 import com.mycompany.knet.repository.KomputerRepository;
+import java.awt.Color;
+import java.awt.Font;
 import java.util.List;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 /**
  *
  * @author Vivob
@@ -23,6 +28,8 @@ public class FormKomputer extends javax.swing.JFrame {
     public FormKomputer() {
         initComponents();
         renderTable(kr.getAllKomputer());
+        aturComboBoxStatus();
+        aturHeaderTabel();
         
         jtKomputer.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -63,26 +70,27 @@ public class FormKomputer extends javax.swing.JFrame {
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         jtKomputer = new javax.swing.JTable();
-        jScrollBar1 = new javax.swing.JScrollBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        BtnKembali.setBackground(new java.awt.Color(255, 255, 226));
+        BtnKembali.setBackground(new java.awt.Color(45, 55, 72));
         BtnKembali.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        BtnKembali.setForeground(new java.awt.Color(91, 91, 163));
+        BtnKembali.setForeground(new java.awt.Color(255, 255, 255));
         BtnKembali.setText("Kembali");
         BtnKembali.addActionListener(this::BtnKembaliActionPerformed);
 
-        jPanel2.setBackground(new java.awt.Color(99, 99, 178));
+        jPanel2.setBackground(new java.awt.Color(113, 153, 126));
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel6.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Daftar Komputer");
 
+        kdKomputer.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         kdKomputer.setForeground(new java.awt.Color(255, 255, 255));
         kdKomputer.setText("Kode Komputer");
 
+        tarif.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         tarif.setForeground(new java.awt.Color(255, 255, 255));
         tarif.setText("Tarif Per Jam");
 
@@ -130,9 +138,9 @@ public class FormKomputer extends javax.swing.JFrame {
                                 .addComponent(BtnHapus, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(kdKomputer)
-                                .addGap(174, 174, 174)
+                                .addGap(184, 184, 184)
                                 .addComponent(tarif, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(156, Short.MAX_VALUE))))
+                        .addContainerGap(197, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,18 +171,20 @@ public class FormKomputer extends javax.swing.JFrame {
 
         tfCari.addActionListener(this::tfCariActionPerformed);
 
-        BtnCari.setBackground(new java.awt.Color(91, 91, 163));
+        BtnCari.setBackground(new java.awt.Color(45, 55, 72));
         BtnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnCari.setForeground(new java.awt.Color(255, 255, 255));
         BtnCari.setText("Cari");
         BtnCari.addActionListener(this::BtnCariActionPerformed);
 
-        BtnTampil.setBackground(new java.awt.Color(91, 91, 163));
+        BtnTampil.setBackground(new java.awt.Color(45, 55, 72));
         BtnTampil.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnTampil.setForeground(new java.awt.Color(255, 255, 255));
         BtnTampil.setText("Tampilkan Semua");
         BtnTampil.addActionListener(this::BtnTampilActionPerformed);
 
+        jtKomputer.setBackground(new java.awt.Color(173, 209, 198));
+        jtKomputer.setFont(new java.awt.Font("Gadugi", 0, 12)); // NOI18N
         jtKomputer.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -195,6 +205,11 @@ public class FormKomputer extends javax.swing.JFrame {
             }
         });
         jtKomputer.setColumnSelectionAllowed(true);
+        jtKomputer.setGridColor(new java.awt.Color(51, 51, 51));
+        jtKomputer.setRowHeight(35);
+        jtKomputer.setSelectionBackground(new java.awt.Color(255, 255, 255));
+        jtKomputer.setShowGrid(true);
+        jtKomputer.getTableHeader().setResizingAllowed(false);
         jScrollPane2.setViewportView(jtKomputer);
         jtKomputer.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         if (jtKomputer.getColumnModel().getColumnCount() > 0) {
@@ -202,25 +217,18 @@ public class FormKomputer extends javax.swing.JFrame {
         }
 
         jDesktopPane1.setLayer(jScrollPane2, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jDesktopPane1.setLayer(jScrollBar1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 514, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -238,7 +246,7 @@ public class FormKomputer extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(BtnTampil, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -263,15 +271,9 @@ public class FormKomputer extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(BtnKembali, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
+                    .addComponent(BtnKembali, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -280,12 +282,9 @@ public class FormKomputer extends javax.swing.JFrame {
                 .addComponent(BtnKembali)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(250, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(159, 159, 159)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -442,6 +441,8 @@ public class FormKomputer extends javax.swing.JFrame {
     }//GEN-LAST:event_tfCariActionPerformed
 
     private void renderTable(List<KomputerModel> daftarKomputer) {
+        boolean sedangMemuat = true;
+
         DefaultTableModel model = (DefaultTableModel) jtKomputer.getModel();
         model.setRowCount(0);
 
@@ -453,6 +454,37 @@ public class FormKomputer extends javax.swing.JFrame {
                 komputer.getStatus()
             });
         }
+
+        sedangMemuat = false;
+    }
+    
+    private void aturComboBoxStatus() {
+        JComboBox<String> combo = new JComboBox<>(
+            new String[]{"Tersedia", "Dipakai", "Maintenance"}
+        );
+
+        jtKomputer.getColumnModel().getColumn(3).setCellEditor(
+            new DefaultCellEditor(combo)
+        );
+
+        jtKomputer.getColumnModel().getColumn(3).setCellRenderer(
+            (table, value, isSelected, hasFocus, row, column) -> {
+                JComboBox<String> comboRenderer = new JComboBox<>(
+                    new String[]{"Tersedia", "Dipakai", "Maintenance"}
+                );
+                comboRenderer.setSelectedItem(value);
+                return comboRenderer;
+            }
+        );
+    }
+    
+    private void aturHeaderTabel() {
+        JTableHeader header = jtKomputer.getTableHeader();
+
+        header.setBackground(new Color(45, 55, 72));
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Poppins", Font.BOLD, 13));
+        header.setPreferredSize(new java.awt.Dimension(0, 40));
     }
         /**
      * @param args the command line arguments
@@ -491,7 +523,6 @@ public class FormKomputer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jtKomputer;
     private javax.swing.JLabel kdKomputer;
