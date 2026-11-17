@@ -361,11 +361,13 @@ public class FormMember extends javax.swing.JFrame {
     }//GEN-LAST:event_BtnKompActionPerformed
 
     private void BtnSesiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSesiActionPerformed
-        
+        new FormSesi().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_BtnSesiActionPerformed
 
     private void BtnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLaporanActionPerformed
-       
+        new FormLaporan().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_BtnLaporanActionPerformed
 
     private void tfNamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaActionPerformed
