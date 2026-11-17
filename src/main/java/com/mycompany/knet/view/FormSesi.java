@@ -32,11 +32,98 @@ public class FormSesi extends javax.swing.JFrame {
 
     public FormSesi() {
         initComponents();
+        setSize(900, 620);
         setLocationRelativeTo(null);
+        aturTampilan();
+        pasangTombol();
         muatUlang();
     }
+    
+         private void aturTampilan() {
+        Color slate = new Color(45, 55, 72);
+        Color hijau = new Color(113, 153, 139);
+        Color krem = new Color(255, 255, 226);
+        Color hijauMuda = new Color(173, 209, 198);
 
-    private void muatUlang() {
+        getContentPane().setBackground(Color.WHITE);
+
+        // header
+        pnlHeader.setBackground(slate);
+        lblJudul.setForeground(Color.WHITE);
+        lblJudul.setFont(new Font("Georgia", Font.BOLD, 18));
+        gayaTombol(btnKembali, krem, slate);
+
+        // kartu "Mulai Sesi Baru"
+        pnlMulai.setBackground(hijau);
+        pnlMulai.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        for (JLabel l : new JLabel[]{lblMulai, lblMember, lblKomputer}) {
+            l.setForeground(Color.WHITE);
+            l.setFont(new Font("Gadugi", Font.BOLD, 12));
+        }
+        lblMulai.setFont(new Font("Gadugi", Font.BOLD, 15));
+        cbMember.setFont(new Font("Gadugi", Font.PLAIN, 13));
+        cbKomputer.setFont(new Font("Gadugi", Font.PLAIN, 13));
+        gayaTombol(btnMulai, krem, slate);
+        gayaTombol(btnAkhiri, krem, slate);
+        gayaTombol(btnMuat, slate, Color.WHITE);
+
+        // kartu tabel
+        pnlTabel.setBackground(krem);
+        pnlTabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lblBerjalan.setForeground(slate);
+        lblBerjalan.setFont(new Font("Gadugi", Font.BOLD, 15));
+        lblPetunjuk.setForeground(slate);
+        lblPetunjuk.setFont(new Font("Gadugi", Font.PLAIN, 12));
+
+        // tabel
+        jScrollPane1.getViewport().setBackground(hijauMuda);
+        jtSesi.setBackground(hijauMuda);
+        jtSesi.setFont(new Font("Gadugi", Font.PLAIN, 12));
+        jtSesi.setRowHeight(35);
+        jtSesi.setGridColor(new Color(51, 51, 51));
+        jtSesi.setSelectionBackground(Color.WHITE);
+        jtSesi.setSelectionForeground(Color.BLACK);
+        jtSesi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // header tabel (pakai renderer supaya warnanya pasti berubah)
+        JTableHeader header = jtSesi.getTableHeader();
+        header.setReorderingAllowed(false);
+        header.setResizingAllowed(false);
+        header.setPreferredSize(new Dimension(0, 40));
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, false, false, row, column);
+                setBackground(slate);
+                setForeground(Color.WHITE);
+                setFont(new Font("Segoe UI", Font.BOLD, 13));
+                setHorizontalAlignment(LEFT);
+                setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 10));
+                return this;
+            }
+        });
+    }   
+        
+     private void gayaTombol(JButton tombol, Color latar, Color tulisan) {
+        // BasicButtonUI memastikan warna tombol tampil apa pun tema Java-nya
+        tombol.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        tombol.setBackground(latar);
+        tombol.setForeground(tulisan);
+        tombol.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tombol.setFocusPainted(false);
+        tombol.setOpaque(true);
+        tombol.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createLineBorder(new Color(45, 55, 72)),
+                javax.swing.BorderFactory.createEmptyBorder(6, 16, 6, 16)));
+    }
+     
+       private void pasangTombol() {
+        btnMulai.addActionListener(e -> mulaiSesi());
+        btnMuat.addActionListener(e -> muatUlang());
+    }
+       
+        private void muatUlang() {
         daftarMember = memberRepo.getAllMembers();
         cbMember.removeAllItems();
         for (MemberModel m : daftarMember) {
@@ -124,7 +211,7 @@ public class FormSesi extends javax.swing.JFrame {
                 .addComponent(lblJudul)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnKembali)
-                .addContainerGap())
+                .addGap(25, 25, 25))
         );
         pnlHeaderLayout.setVerticalGroup(
             pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -133,7 +220,7 @@ public class FormSesi extends javax.swing.JFrame {
                 .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblJudul)
                     .addComponent(btnKembali))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pnlMulai.setBackground(new java.awt.Color(113, 153, 139));
@@ -181,8 +268,8 @@ public class FormSesi extends javax.swing.JFrame {
         pnlMulaiLayout.setHorizontalGroup(
             pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMulaiLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(24, 24, 24)
+                .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(pnlMulaiLayout.createSequentialGroup()
                         .addComponent(btnMulai)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -200,8 +287,8 @@ public class FormSesi extends javax.swing.JFrame {
                                 .addComponent(lblMulai)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(pnlMulaiLayout.createSequentialGroup()
-                                .addComponent(cbMember, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cbMember, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, Short.MAX_VALUE)
                                 .addComponent(cbKomputer, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())))
         );
@@ -226,7 +313,7 @@ public class FormSesi extends javax.swing.JFrame {
                     .addComponent(btnMulai)
                     .addComponent(btnAkhiri)
                     .addComponent(btnMuat))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         pnlTabel.setBackground(new java.awt.Color(255, 255, 226));
@@ -240,6 +327,102 @@ public class FormSesi extends javax.swing.JFrame {
         jtSesi.setForeground(new java.awt.Color(45, 55, 72));
         jtSesi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -280,39 +463,35 @@ public class FormSesi extends javax.swing.JFrame {
         pnlTabelLayout.setHorizontalGroup(
             pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlTabelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(24, 24, 24)
                 .addGroup(pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(pnlTabelLayout.createSequentialGroup()
                         .addComponent(lblPetunjuk)
-                        .addGap(275, 408, Short.MAX_VALUE))
+                        .addGap(284, 284, 284))
                     .addGroup(pnlTabelLayout.createSequentialGroup()
-                        .addGroup(pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblBerjalan, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1))
+                        .addComponent(lblBerjalan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
         );
         pnlTabelLayout.setVerticalGroup(
             pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlTabelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
                 .addComponent(lblBerjalan)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblPetunjuk, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlHeader, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlMulai, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlTabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+            .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlMulai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE)
+            .addComponent(pnlTabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -321,11 +500,11 @@ public class FormSesi extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMulai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlTabel, javax.swing.GroupLayout.PREFERRED_SIZE, 249, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(pnlTabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKembaliActionPerformed
