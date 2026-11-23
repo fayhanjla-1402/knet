@@ -9,155 +9,94 @@ import com.mycompany.knet.model.SesiModel;
 import com.mycompany.knet.repository.KomputerRepository;
 import com.mycompany.knet.repository.MemberRepository;
 import com.mycompany.knet.repository.SesiRepository;
+import java.awt.Color;
+import java.awt.Font;
+import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 /**
  *
  * @author asusa
  */
 public class FormSesi extends javax.swing.JFrame {
-    
-        private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormSesi.class.getName());
-
-    private MemberRepository memberRepo = new MemberRepository();
-    private KomputerRepository komputerRepo = new KomputerRepository();
-    private SesiRepository sesiRepo = new SesiRepository();
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormSesi.class.getName());
+    private final MemberRepository mr = new MemberRepository();
+    private final KomputerRepository kr = new KomputerRepository();
+    private final SesiRepository sr = new SesiRepository();
     private List<MemberModel> daftarMember;
     private List<KomputerModel> daftarKomputer;
 
     public FormSesi() {
         initComponents();
-        setSize(900, 620);
+        renderTable(sr.getAllSesi());
+        aturHeaderTabel();
         setLocationRelativeTo(null);
-        aturTampilan();
-        pasangTombol();
         muatUlang();
     }
-    
-         private void aturTampilan() {
-        Color slate = new Color(45, 55, 72);
-        Color hijau = new Color(113, 153, 139);
-        Color krem = new Color(255, 255, 226);
-        Color hijauMuda = new Color(173, 209, 198);
 
-        getContentPane().setBackground(Color.WHITE);
-
-        // header
-        pnlHeader.setBackground(slate);
-        lblJudul.setForeground(Color.WHITE);
-        lblJudul.setFont(new Font("Georgia", Font.BOLD, 18));
-        gayaTombol(btnKembali, krem, slate);
-
-        // kartu "Mulai Sesi Baru"
-        pnlMulai.setBackground(hijau);
-        pnlMulai.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        for (JLabel l : new JLabel[]{lblMulai, lblMember, lblKomputer}) {
-            l.setForeground(Color.WHITE);
-            l.setFont(new Font("Gadugi", Font.BOLD, 12));
-        }
-        lblMulai.setFont(new Font("Gadugi", Font.BOLD, 15));
-        cbMember.setFont(new Font("Gadugi", Font.PLAIN, 13));
-        cbKomputer.setFont(new Font("Gadugi", Font.PLAIN, 13));
-        gayaTombol(btnMulai, krem, slate);
-        gayaTombol(btnAkhiri, krem, slate);
-        gayaTombol(btnMuat, slate, Color.WHITE);
-
-        // kartu tabel
-        pnlTabel.setBackground(krem);
-        pnlTabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lblBerjalan.setForeground(slate);
-        lblBerjalan.setFont(new Font("Gadugi", Font.BOLD, 15));
-        lblPetunjuk.setForeground(slate);
-        lblPetunjuk.setFont(new Font("Gadugi", Font.PLAIN, 12));
-
-        // tabel
-        jScrollPane1.getViewport().setBackground(hijauMuda);
-        jtSesi.setBackground(hijauMuda);
-        jtSesi.setFont(new Font("Gadugi", Font.PLAIN, 12));
-        jtSesi.setRowHeight(35);
-        jtSesi.setGridColor(new Color(51, 51, 51));
-        jtSesi.setSelectionBackground(Color.WHITE);
-        jtSesi.setSelectionForeground(Color.BLACK);
-        jtSesi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // header tabel (pakai renderer supaya warnanya pasti berubah)
-        JTableHeader header = jtSesi.getTableHeader();
-        header.setReorderingAllowed(false);
-        header.setResizingAllowed(false);
-        header.setPreferredSize(new Dimension(0, 40));
-        header.setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                super.getTableCellRendererComponent(table, value, false, false, row, column);
-                setBackground(slate);
-                setForeground(Color.WHITE);
-                setFont(new Font("Segoe UI", Font.BOLD, 13));
-                setHorizontalAlignment(LEFT);
-                setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                return this;
+    private void muatUlang() {
+        try {
+            daftarMember = mr.getAllMembers();
+            cbMember.removeAllItems();
+            for (MemberModel member : daftarMember) {
+                cbMember.addItem(member.getIdMember() + " - " + member.getNama());
             }
-        });
-    }   
-        
-     private void gayaTombol(JButton tombol, Color latar, Color tulisan) {
-        // BasicButtonUI memastikan warna tombol tampil apa pun tema Java-nya
-        tombol.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        tombol.setBackground(latar);
-        tombol.setForeground(tulisan);
-        tombol.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        tombol.setFocusPainted(false);
-        tombol.setOpaque(true);
-        tombol.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                javax.swing.BorderFactory.createLineBorder(new Color(45, 55, 72)),
-                javax.swing.BorderFactory.createEmptyBorder(6, 16, 6, 16)));
-    }
-     
-       private void pasangTombol() {
-        btnMulai.addActionListener(e -> mulaiSesi());
-        btnMuat.addActionListener(e -> muatUlang());
-    }
-       
-        private void muatUlang() {
-        daftarMember = memberRepo.getAllMembers();
-        cbMember.removeAllItems();
-        for (MemberModel m : daftarMember) {
-            cbMember.addItem(m.getIdMember() + " - " + m.getNama());
+
+            daftarKomputer = kr.getKomputerTersedia();
+            cbKomputer.removeAllItems();
+            for (KomputerModel komputer : daftarKomputer) {
+                cbKomputer.addItem(komputer.getNamaKomputer() + " (Rp " + komputer.getTarifPerJam() + "/jam)");
+            }
+
+            renderTable(sr.getSesiBerjalan());
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
         }
-
-        daftarKomputer = komputerRepo.getKomputerTersedia();
-        cbKomputer.removeAllItems();
-        for (KomputerModel k : daftarKomputer) {
-            cbKomputer.addItem(k.getNamaKomputer() + " (Rp " + k.getTarifPerJam() + "/jam)");
-        }
-
-        tampilSesiBerjalan();
     }
 
-    private void tampilSesiBerjalan() {
+    private void renderTable(List<SesiModel> daftarSesi) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         DefaultTableModel model = (DefaultTableModel) jtSesi.getModel();
         model.setRowCount(0);
 
-        for (SesiModel s : sesiRepo.getSesiBerjalan()) {
+        for (SesiModel sesi : daftarSesi) {
             model.addRow(new Object[]{
-                s.getIdSesi(),
-                s.getNamaMember(),
-                s.getNamaKomputer(),
-                s.getJamMulai() == null ? "" : format.format(s.getJamMulai()),
-                s.getJamSelesai() == null ? "" : format.format(s.getJamSelesai()),
-                "Rp " + formatAngka(s.getTotalBiaya())
+                sesi.getIdSesi(),
+                sesi.getNamaMember(),
+                sesi.getNamaKomputer(),
+                formatWaktu(sesi.getJamMulai(), format),
+                formatWaktu(sesi.getJamSelesai(), format),
+                "Rp " + formatAngka(sesi.getTotalBiaya())
             });
         }
     }
 
+    private String formatWaktu(Timestamp waktu, SimpleDateFormat format) {
+        if (waktu == null) {
+            return "";
+        }
+
+        return format.format(waktu);
+    }
+    
     private String formatAngka(int angka) {
         return NumberFormat.getInstance(Locale.forLanguageTag("id-ID")).format(angka);
+    }
+    
+    private void aturHeaderTabel() {
+        JTableHeader header = jtSesi.getTableHeader();
+
+        header.setBackground(new Color(45, 55, 72));
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Poppins", Font.BOLD, 13));
+        header.setPreferredSize(new java.awt.Dimension(0, 40));
     }
     
     /**
@@ -211,7 +150,7 @@ public class FormSesi extends javax.swing.JFrame {
                 .addComponent(lblJudul)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnKembali)
-                .addGap(25, 25, 25))
+                .addContainerGap())
         );
         pnlHeaderLayout.setVerticalGroup(
             pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -220,7 +159,7 @@ public class FormSesi extends javax.swing.JFrame {
                 .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblJudul)
                     .addComponent(btnKembali))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pnlMulai.setBackground(new java.awt.Color(113, 153, 139));
@@ -239,11 +178,11 @@ public class FormSesi extends javax.swing.JFrame {
         lblKomputer.setForeground(new java.awt.Color(255, 255, 255));
         lblKomputer.setText("Komputer Tersedia");
 
-        cbMember.setFont(new java.awt.Font("Gadugi", 0, 13)); // NOI18N
+        cbMember.setFont(new java.awt.Font("Gadugi", 1, 13)); // NOI18N
         cbMember.setForeground(new java.awt.Color(45, 55, 72));
         cbMember.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        cbKomputer.setFont(new java.awt.Font("Gadugi", 0, 13)); // NOI18N
+        cbKomputer.setFont(new java.awt.Font("Gadugi", 1, 13)); // NOI18N
         cbKomputer.setForeground(new java.awt.Color(45, 55, 72));
         cbKomputer.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -268,33 +207,26 @@ public class FormSesi extends javax.swing.JFrame {
         pnlMulaiLayout.setHorizontalGroup(
             pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMulaiLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(27, 27, 27)
+                .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlMulaiLayout.createSequentialGroup()
                         .addComponent(btnMulai)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAkhiri)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnMuat)
-                        .addGap(0, 300, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(pnlMulaiLayout.createSequentialGroup()
                         .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMulaiLayout.createSequentialGroup()
-                                .addComponent(lblMember)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblKomputer))
-                            .addGroup(pnlMulaiLayout.createSequentialGroup()
-                                .addComponent(lblMulai)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(pnlMulaiLayout.createSequentialGroup()
-                                .addComponent(cbMember, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, Short.MAX_VALUE)
-                                .addComponent(cbKomputer, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())))
+                            .addComponent(lblMember)
+                            .addComponent(lblMulai)
+                            .addComponent(cbMember, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbKomputer, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblKomputer))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
-
-        pnlMulaiLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cbKomputer, cbMember});
-
         pnlMulaiLayout.setVerticalGroup(
             pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMulaiLayout.createSequentialGroup()
@@ -306,14 +238,14 @@ public class FormSesi extends javax.swing.JFrame {
                     .addComponent(lblKomputer))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbKomputer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbMember, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbKomputer, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlMulaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnMulai)
                     .addComponent(btnAkhiri)
                     .addComponent(btnMuat))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pnlTabel.setBackground(new java.awt.Color(255, 255, 226));
@@ -324,7 +256,8 @@ public class FormSesi extends javax.swing.JFrame {
 
         jScrollPane1.setBackground(new java.awt.Color(173, 209, 198));
 
-        jtSesi.setForeground(new java.awt.Color(45, 55, 72));
+        jtSesi.setBackground(new java.awt.Color(173, 209, 198));
+        jtSesi.setForeground(new java.awt.Color(255, 255, 255));
         jtSesi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -448,7 +381,7 @@ public class FormSesi extends javax.swing.JFrame {
             }
         });
         jtSesi.setFillsViewportHeight(true);
-        jtSesi.setGridColor(new java.awt.Color(255, 255, 255));
+        jtSesi.setGridColor(new java.awt.Color(51, 51, 51));
         jtSesi.setRowHeight(35);
         jtSesi.setSelectionBackground(new java.awt.Color(255, 255, 255));
         jtSesi.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -462,35 +395,32 @@ public class FormSesi extends javax.swing.JFrame {
         pnlTabel.setLayout(pnlTabelLayout);
         pnlTabelLayout.setHorizontalGroup(
             pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlTabelLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTabelLayout.createSequentialGroup()
+                .addContainerGap(30, Short.MAX_VALUE)
                 .addGroup(pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(pnlTabelLayout.createSequentialGroup()
-                        .addComponent(lblPetunjuk)
-                        .addGap(284, 284, 284))
-                    .addGroup(pnlTabelLayout.createSequentialGroup()
-                        .addComponent(lblBerjalan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                    .addComponent(lblPetunjuk)
+                    .addComponent(lblBerjalan, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 574, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28))
         );
         pnlTabelLayout.setVerticalGroup(
             pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlTabelLayout.createSequentialGroup()
-                .addGap(12, 12, 12)
+                .addContainerGap(9, Short.MAX_VALUE)
                 .addComponent(lblBerjalan)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblPetunjuk, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addGap(17, 17, 17))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlMulai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE)
+            .addComponent(pnlHeader, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlMulai, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(pnlTabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -500,7 +430,8 @@ public class FormSesi extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMulai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlTabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(pnlTabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -517,22 +448,26 @@ public class FormSesi extends javax.swing.JFrame {
 
         if (baris == -1) {
             JOptionPane.showMessageDialog(this, "Pilih satu baris sesi yang ingin diakhiri!");
-            return;
-        }
+        } else {
+            int konfirmasi = JOptionPane.showConfirmDialog(
+                    this,
+                    "Akhiri sesi ini?",
+                    "Konfirmasi",
+                    JOptionPane.YES_NO_OPTION
+            );
 
-        int idSesi = Integer.parseInt(jtSesi.getValueAt(baris, 0).toString());
-        int pilihan = JOptionPane.showConfirmDialog(this, "Akhiri sesi ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            if (konfirmasi == JOptionPane.YES_OPTION) {
+                try {
+                    int idSesi = Integer.parseInt(jtSesi.getValueAt(baris, 0).toString());
+                    int totalBiaya = sr.finishSesi(idSesi);
 
-        if (pilihan != JOptionPane.YES_OPTION) {
-            return;
-        }
+                    JOptionPane.showMessageDialog(this, "Sesi selesai. Total biaya: Rp " + formatAngka(totalBiaya));
+                    muatUlang();
 
-        try {
-            int totalBiaya = sesiRepo.finishSesi(idSesi);
-            JOptionPane.showMessageDialog(this, "Sesi selesai. Total biaya: Rp " + formatAngka(totalBiaya));
-            muatUlang();
-        } catch (RuntimeException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+            }
         }
     }//GEN-LAST:event_btnAkhiriActionPerformed
 
@@ -542,19 +477,19 @@ public class FormSesi extends javax.swing.JFrame {
 
         if (iMember == -1 || iKomputer == -1) {
             JOptionPane.showMessageDialog(this, "Pilih member dan komputer yang tersedia dulu!");
-            return;
-        }
+        } else {
+            try {
+                SesiModel sesi = new SesiModel();
+                sesi.setIdMember(daftarMember.get(iMember).getIdMember());
+                sesi.setIdKomputer(daftarKomputer.get(iKomputer).getIdKomputer());
+                sr.addSesi(sesi);
 
-        try {
-            SesiModel sesi = new SesiModel();
-            sesi.setIdMember(daftarMember.get(iMember).getIdMember());
-            sesi.setIdKomputer(daftarKomputer.get(iKomputer).getIdKomputer());
-            sesiRepo.addSesi(sesi);
+                JOptionPane.showMessageDialog(this, "Sesi berhasil dimulai!");
+                muatUlang();
 
-            JOptionPane.showMessageDialog(this, "Sesi berhasil dimulai.");
-            muatUlang();
-        } catch (RuntimeException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
         }
     }//GEN-LAST:event_btnMulaiActionPerformed
 

@@ -81,26 +81,29 @@ public class FormMember extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
 
         jPanel2.setBackground(new java.awt.Color(113, 153, 139));
-        jPanel2.setBorder(new javax.swing.border.MatteBorder(null));
 
-        jLabel6.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Gadugi", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Daftar Member");
 
-        nmMember.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        nmMember.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         nmMember.setForeground(new java.awt.Color(255, 255, 255));
         nmMember.setText("Nama");
 
-        noMember.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        noMember.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         noMember.setForeground(new java.awt.Color(255, 255, 255));
         noMember.setText("No HP");
 
-        tglMember.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        tglMember.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         tglMember.setForeground(new java.awt.Color(255, 255, 255));
         tglMember.setText("Tanggal Daftar");
 
+        tfNama.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         tfNama.addActionListener(this::tfNamaActionPerformed);
 
+        tfNo.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+
+        tfTgl.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         tfTgl.setEnabled(false);
 
         BtnSimpan.setBackground(new java.awt.Color(255, 255, 226));
@@ -139,16 +142,16 @@ public class FormMember extends javax.swing.JFrame {
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(nmMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(noMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(noMember, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(tglMember, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap(25, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,19 +165,19 @@ public class FormMember extends javax.swing.JFrame {
                     .addComponent(tglMember))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tfNama, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfNo, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfTgl, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BtnSimpan)
                     .addComponent(BtnUbah)
                     .addComponent(BtnHapus))
-                .addGap(18, 18, 18))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 226));
-        jPanel1.setBorder(new javax.swing.border.MatteBorder(null));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         jLabel10.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
         jLabel10.setText("Cari Member");
@@ -194,6 +197,7 @@ public class FormMember extends javax.swing.JFrame {
         BtnTampil.addActionListener(this::BtnTampilActionPerformed);
 
         jtMember.setBackground(new java.awt.Color(173, 209, 196));
+        jtMember.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jtMember.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -327,14 +331,12 @@ public class FormMember extends javax.swing.JFrame {
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 525, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -355,7 +357,7 @@ public class FormMember extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                             .addComponent(BtnTampil))
                         .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -364,36 +366,36 @@ public class FormMember extends javax.swing.JFrame {
                 .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfCari, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfCari, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(BtnCari)
                     .addComponent(BtnTampil))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(8, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
-        jPanel3.setBackground(new java.awt.Color(255, 255, 226));
-        jPanel3.setBorder(new javax.swing.border.MatteBorder(null));
+        jPanel3.setBackground(new java.awt.Color(45, 55, 72));
 
+        jLabel1.setBackground(new java.awt.Color(255, 255, 226));
         jLabel1.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(45, 55, 72));
+        jLabel1.setForeground(new java.awt.Color(255, 255, 226));
         jLabel1.setText("KNET");
 
-        BtnKomp.setBackground(new java.awt.Color(45, 55, 72));
+        BtnKomp.setBackground(new java.awt.Color(255, 255, 226));
         BtnKomp.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        BtnKomp.setForeground(new java.awt.Color(255, 255, 255));
+        BtnKomp.setForeground(new java.awt.Color(45, 55, 72));
         BtnKomp.setText("Daftar Komputer");
         BtnKomp.addActionListener(this::BtnKompActionPerformed);
 
-        BtnSesi.setBackground(new java.awt.Color(45, 55, 72));
+        BtnSesi.setBackground(new java.awt.Color(255, 255, 226));
         BtnSesi.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        BtnSesi.setForeground(new java.awt.Color(255, 255, 255));
+        BtnSesi.setForeground(new java.awt.Color(45, 55, 72));
         BtnSesi.setText("Daftar Sesi");
         BtnSesi.addActionListener(this::BtnSesiActionPerformed);
 
-        BtnLaporan.setBackground(new java.awt.Color(45, 55, 72));
+        BtnLaporan.setBackground(new java.awt.Color(255, 255, 226));
         BtnLaporan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        BtnLaporan.setForeground(new java.awt.Color(255, 255, 255));
+        BtnLaporan.setForeground(new java.awt.Color(45, 55, 72));
         BtnLaporan.setText("Laporan");
         BtnLaporan.addActionListener(this::BtnLaporanActionPerformed);
 
@@ -431,9 +433,9 @@ public class FormMember extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -456,12 +458,14 @@ public class FormMember extends javax.swing.JFrame {
     }//GEN-LAST:event_BtnKompActionPerformed
 
     private void BtnSesiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSesiActionPerformed
-        new FormSesi().setVisible(true);
+        FormSesi formSesi = new FormSesi();
+        formSesi.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_BtnSesiActionPerformed
 
     private void BtnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLaporanActionPerformed
-        new FormLaporan().setVisible(true);
+        FormLaporan formLaporan = new FormLaporan();
+        formLaporan.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_BtnLaporanActionPerformed
 

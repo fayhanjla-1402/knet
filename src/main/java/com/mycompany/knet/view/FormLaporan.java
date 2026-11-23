@@ -6,20 +6,15 @@ package com.mycompany.knet.view;
 import com.mycompany.knet.model.SesiModel;
 import com.mycompany.knet.repository.SesiRepository;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -30,150 +25,87 @@ import javax.swing.table.JTableHeader;
 public class FormLaporan extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormLaporan.class.getName());
-
-    /**
-     * Creates new form FormLaporan
-     */
-      private final SesiRepository sesiRepo = new SesiRepository();
+    private final SesiRepository sr = new SesiRepository();
 
     public FormLaporan() {
         initComponents();
-        aturTampilan();
-        pasangTombol();
+        renderTable(sr.getAllSesi());
+        setLocationRelativeTo(null);
+        aturHeaderTabel();
         tfTanggal.setText(LocalDate.now().toString());
         tampilSemua();
     }
-    
-    private void aturTampilan() {
-        Color slate = new Color(45, 55, 72);
-        Color hijau = new Color(113, 153, 139);
-        Color krem = new Color(255, 255, 226);
-        Color hijauMuda = new Color(173, 209, 198);
-
-        getContentPane().setBackground(Color.WHITE);
-
-        // header
-        pnlHeader.setBackground(slate);
-        lblJudul.setForeground(Color.WHITE);
-        lblJudul.setFont(new Font("Georgia", Font.BOLD, 18));
-        gayaTombol(btnKembali, krem, slate);
-
-        // kartu filter tanggal
-        pnlFilter.setBackground(hijau);
-        pnlFilter.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lblTanggal.setForeground(Color.WHITE);
-        lblTanggal.setFont(new Font("Gadugi", Font.BOLD, 12));
-        tfTanggal.setFont(new Font("Gadugi", Font.PLAIN, 13));
-        gayaTombol(btnTanggal, slate, Color.WHITE);
-        gayaTombol(btnSemua, krem, slate);
-
-        // kartu total
-        pnlTotal.setBackground(krem);
-        pnlTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lblKeterangan.setForeground(slate);
-        lblKeterangan.setFont(new Font("Gadugi", Font.PLAIN, 13));
-        lblTotal.setForeground(slate);
-        lblTotal.setFont(new Font("Georgia", Font.BOLD, 28));
-        lblTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-
-        // kartu tabel
-        pnlTabel.setBackground(krem);
-        pnlTabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        // tabel
-        jScrollPane1.getViewport().setBackground(hijauMuda);
-        jtLaporan.setBackground(hijauMuda);
-        jtLaporan.setFont(new Font("Gadugi", Font.PLAIN, 12));
-        jtLaporan.setRowHeight(35);
-        jtLaporan.setGridColor(new Color(51, 51, 51));
-        jtLaporan.setSelectionBackground(Color.WHITE);
-        jtLaporan.setSelectionForeground(Color.BLACK);
-        jtLaporan.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        JTableHeader header = jtLaporan.getTableHeader();
-        header.setReorderingAllowed(false);
-        header.setResizingAllowed(false);
-        header.setPreferredSize(new Dimension(0, 40));
-        header.setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                super.getTableCellRendererComponent(table, value, false, false, row, column);
-                setBackground(slate);
-                setForeground(Color.WHITE);
-                setFont(new Font("Segoe UI", Font.BOLD, 13));
-                setHorizontalAlignment(LEFT);
-                setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                return this;
-            }
-        });
-    }
-
-    private void gayaTombol(JButton tombol, Color latar, Color tulisan) {
-        tombol.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        tombol.setBackground(latar);
-        tombol.setForeground(tulisan);
-        tombol.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        tombol.setFocusPainted(false);
-        tombol.setOpaque(true);
-        tombol.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                javax.swing.BorderFactory.createLineBorder(new Color(45, 55, 72)),
-                javax.swing.BorderFactory.createEmptyBorder(6, 16, 6, 16)));
-    }
-
-    // Semua tombol dipasang lewat kode (tidak perlu klik dua kali di Design)
-    private void pasangTombol() {
-        btnTanggal.addActionListener(e -> tampilPerTanggal());
-        btnSemua.addActionListener(e -> tampilSemua());
-        btnKembali.addActionListener(e -> {
-            new FormMember().setVisible(true);
-            this.dispose();
-        });
-    }
 
     private void tampilSemua() {
-        isiTabel(sesiRepo.getAllSesi());
-        lblKeterangan.setText("Total pendapatan seluruh sesi");
-        lblTotal.setText("Rp " + formatAngka(sesiRepo.getTotalPendapatan()));
+        try {
+            List<SesiModel> daftar = sr.getAllSesi();
+            renderTable(daftar);
+
+            lblKeterangan.setText("Total pendapatan seluruh sesi (" + daftar.size() + " sesi)");
+            lblTotal.setText("Rp " + formatAngka(sr.getTotalPendapatan()));
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
     }
 
     private void tampilPerTanggal() {
         String teks = tfTanggal.getText().trim();
-        Date tanggal;
 
         try {
-            tanggal = Date.valueOf(teks);
+            Date tanggal = Date.valueOf(teks);
+
+            List<SesiModel> daftar = sr.getSesiByTanggal(tanggal);
+            renderTable(daftar);
+
+            lblKeterangan.setText("Total pendapatan tanggal " + teks + " (" + daftar.size() + " sesi)");
+            lblTotal.setText("Rp " + formatAngka(sr.getPendapatanByTanggal(tanggal)));
+
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, "Format tanggal harus yyyy-MM-dd, contoh: 2026-11-09");
-            return;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
         }
-
-        isiTabel(sesiRepo.getSesiByTanggal(tanggal));
-        lblKeterangan.setText("Total pendapatan tanggal " + teks);
-        lblTotal.setText("Rp " + formatAngka(sesiRepo.getPendapatanByTanggal(tanggal)));
     }
 
-    private void isiTabel(List<SesiModel> daftarSesi) {
+    private void renderTable(List<SesiModel> daftarSesi) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         DefaultTableModel model = (DefaultTableModel) jtLaporan.getModel();
         model.setRowCount(0);
 
-        for (SesiModel s : daftarSesi) {
+        for (SesiModel sesi : daftarSesi) {
             model.addRow(new Object[]{
-                s.getIdSesi(),
-                s.getNamaMember(),
-                s.getNamaKomputer(),
-                s.getJamMulai() == null ? "" : format.format(s.getJamMulai()),
-                s.getJamSelesai() == null ? "" : format.format(s.getJamSelesai()),
-                "Rp " + formatAngka(s.getTotalBiaya())
+                sesi.getIdSesi(),
+                sesi.getNamaMember(),
+                sesi.getNamaKomputer(),
+                formatWaktu(sesi.getJamMulai(), format),
+                formatWaktu(sesi.getJamSelesai(), format),
+                "Rp " + formatAngka(sesi.getTotalBiaya())
             });
         }
+    }
+    
+    private String formatWaktu(Timestamp waktu, SimpleDateFormat format) {
+        if (waktu == null) {
+            return "";
+        }
+
+        return format.format(waktu);
     }
 
     private String formatAngka(int angka) {
         return NumberFormat.getInstance(Locale.forLanguageTag("id-ID")).format(angka);
     }
+    
+    private void aturHeaderTabel() {
+        JTableHeader header = jtLaporan.getTableHeader();
 
+        header.setBackground(new Color(113,153,139));
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Poppins", Font.BOLD, 13));
+        header.setPreferredSize(new java.awt.Dimension(0, 40));
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -191,18 +123,24 @@ public class FormLaporan extends javax.swing.JFrame {
         tfTanggal = new javax.swing.JTextField();
         btnTanggal = new javax.swing.JButton();
         btnSemua = new javax.swing.JButton();
-        pnlTabel = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jtLaporan = new javax.swing.JTable();
         pnlTotal = new javax.swing.JPanel();
         lblKeterangan = new javax.swing.JLabel();
         lblTotal = new javax.swing.JLabel();
+        pnlTabel = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jtLaporan = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Knet - Laporan");
+        setBackground(new java.awt.Color(255, 255, 255));
 
+        pnlHeader.setBackground(new java.awt.Color(45, 55, 72));
+
+        lblJudul.setFont(new java.awt.Font("Georgia", 1, 20)); // NOI18N
+        lblJudul.setForeground(new java.awt.Color(255, 255, 204));
         lblJudul.setText("Knet - Laporan");
 
+        btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnKembali.setText("Kembali ke Menu");
         btnKembali.addActionListener(this::btnKembaliActionPerformed);
 
@@ -215,7 +153,7 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addComponent(lblJudul)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnKembali)
-                .addGap(25, 25, 25))
+                .addGap(24, 24, 24))
         );
         pnlHeaderLayout.setVerticalGroup(
             pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -227,13 +165,23 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
+        pnlFilter.setBackground(new java.awt.Color(255, 255, 226));
+
+        lblTanggal.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblTanggal.setForeground(new java.awt.Color(45, 55, 72));
         lblTanggal.setText("Tanggal (yyyy-MM-dd)");
 
-        tfTanggal.addActionListener(this::tfTanggalActionPerformed);
+        tfTanggal.setBackground(new java.awt.Color(45, 55, 72));
+        tfTanggal.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
+        tfTanggal.setForeground(new java.awt.Color(255, 255, 255));
 
+        btnTanggal.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnTanggal.setForeground(new java.awt.Color(45, 55, 72));
         btnTanggal.setText("Tampil per Tanggal");
         btnTanggal.addActionListener(this::btnTanggalActionPerformed);
 
+        btnSemua.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSemua.setForeground(new java.awt.Color(45, 55, 72));
         btnSemua.setText("Tampil Semua");
         btnSemua.addActionListener(this::btnSemuaActionPerformed);
 
@@ -242,32 +190,164 @@ public class FormLaporan extends javax.swing.JFrame {
         pnlFilterLayout.setHorizontalGroup(
             pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlFilterLayout.createSequentialGroup()
-                .addGap(31, 31, 31)
+                .addGap(25, 25, 25)
                 .addGroup(pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTanggal)
                     .addGroup(pnlFilterLayout.createSequentialGroup()
-                        .addComponent(tfTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSemua, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(101, Short.MAX_VALUE))
+                        .addComponent(btnSemua, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlFilterLayout.setVerticalGroup(
             pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlFilterLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(lblTanggal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnTanggal)
                     .addComponent(btnSemua))
-                .addGap(13, 13, 13))
+                .addGap(0, 13, Short.MAX_VALUE))
         );
 
+        pnlTotal.setBackground(new java.awt.Color(113, 153, 139));
+
+        lblKeterangan.setFont(new java.awt.Font("Gadugi", 1, 14)); // NOI18N
+        lblKeterangan.setForeground(new java.awt.Color(255, 255, 255));
+        lblKeterangan.setText("Total pendapatan seluruh sesi");
+
+        lblTotal.setFont(new java.awt.Font("Georgia", 1, 20)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(255, 255, 226));
+        lblTotal.setText("Rp 0");
+
+        javax.swing.GroupLayout pnlTotalLayout = new javax.swing.GroupLayout(pnlTotal);
+        pnlTotal.setLayout(pnlTotalLayout);
+        pnlTotalLayout.setHorizontalGroup(
+            pnlTotalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlTotalLayout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(lblKeterangan)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        pnlTotalLayout.setVerticalGroup(
+            pnlTotalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlTotalLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlTotalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblKeterangan)
+                    .addComponent(lblTotal))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pnlTabel.setBackground(new java.awt.Color(45, 55, 72));
+
+        jtLaporan.setBackground(new java.awt.Color(255, 255, 226));
+        jtLaporan.setFont(new java.awt.Font("Gadugi", 1, 12)); // NOI18N
+        jtLaporan.setForeground(new java.awt.Color(45, 55, 72));
         jtLaporan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -293,70 +373,49 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
         jtLaporan.setFillsViewportHeight(true);
+        jtLaporan.setGridColor(new java.awt.Color(51, 51, 51));
         jtLaporan.setRowHeight(35);
+        jtLaporan.setSelectionBackground(new java.awt.Color(255, 255, 255));
         jtLaporan.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jtLaporan.setShowGrid(true);
         jScrollPane1.setViewportView(jtLaporan);
-
-        lblKeterangan.setText("Total pendapatan seluruh sesi");
-
-        lblTotal.setText("Rp 0");
-
-        javax.swing.GroupLayout pnlTotalLayout = new javax.swing.GroupLayout(pnlTotal);
-        pnlTotal.setLayout(pnlTotalLayout);
-        pnlTotalLayout.setHorizontalGroup(
-            pnlTotalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlTotalLayout.createSequentialGroup()
-                .addComponent(lblKeterangan)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblTotal)
-                .addContainerGap())
-        );
-        pnlTotalLayout.setVerticalGroup(
-            pnlTotalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlTotalLayout.createSequentialGroup()
-                .addGroup(pnlTotalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblKeterangan)
-                    .addComponent(lblTotal))
-                .addGap(0, 6, Short.MAX_VALUE))
-        );
 
         javax.swing.GroupLayout pnlTabelLayout = new javax.swing.GroupLayout(pnlTabel);
         pnlTabel.setLayout(pnlTabelLayout);
         pnlTabelLayout.setHorizontalGroup(
             pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTabelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(pnlTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 543, Short.MAX_VALUE))
-                .addGap(31, 31, 31))
+                .addContainerGap(25, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 689, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
         );
         pnlTabelLayout.setVerticalGroup(
             pnlTabelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTabelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
+            .addGroup(pnlTabelLayout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlTabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlTabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(pnlFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlHeader, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlTabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(pnlTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlTabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -364,20 +423,17 @@ public class FormLaporan extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKembaliActionPerformed
-        // TODO add your handling code here:
+        new FormMember().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnKembaliActionPerformed
 
     private void btnTanggalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTanggalActionPerformed
-        // TODO add your handling code here:
+        tampilPerTanggal();
     }//GEN-LAST:event_btnTanggalActionPerformed
 
     private void btnSemuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSemuaActionPerformed
-        // TODO add your handling code here:
+        tampilSemua();
     }//GEN-LAST:event_btnSemuaActionPerformed
-
-    private void tfTanggalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfTanggalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfTanggalActionPerformed
 
     /**
      * @param args the command line arguments
