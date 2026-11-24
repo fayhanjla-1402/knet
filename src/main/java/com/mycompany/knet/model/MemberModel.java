@@ -17,6 +17,10 @@ public class MemberModel {
     private Date tanggalDaftar;
 
     public MemberModel() {
+        this.idMember = 0;
+        this.nama = "";
+        this.noHp = "";
+        this.tanggalDaftar = null;
     }
 
     public MemberModel(int idMember, String nama, String noHp, Date tanggalDaftar) {
@@ -40,6 +44,13 @@ public class MemberModel {
 
     public Date getTanggalDaftar() {
         return tanggalDaftar;
+    }
+    
+    public void setMemberModel(int idMember, String nama, String noHp) {
+        this.idMember = idMember;
+        this.nama = nama;
+        this.noHp = noHp;
+        this.tanggalDaftar = tanggalDaftar;
     }
 
     public void setIdMember(int idMember) {

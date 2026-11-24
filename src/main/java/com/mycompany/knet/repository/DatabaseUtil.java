@@ -6,9 +6,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseUtil {
-    private static String url = "jdbc:mysql://localhost:3306/db_knet";
+    private static String url = "jdbc:mysql://localhost:8889/db_knet";
     private static String user = "root";
-    private static String password = "";
+    private static String password = "root";
     private static Connection koneksi;
 
     public static Connection getKoneksi() {

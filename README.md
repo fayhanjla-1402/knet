@@ -1,27 +1,27 @@
 # Knet: Aplikasi Manajemen Warnet
 
-Aplikasi desktop sederhana berbasis Java Swing dan MySQL untuk mengelola member, komputer, dan sesi pemakaian warnet. Fokus proyek ada di sisi database: aplikasi dibuat ringkas, tetapi fitur database dimanfaatkan maksimal.
+Aplikasi desktop sederhana berbasis Java Swing dan MySQL untuk mengelola member, komputer, dan sesi pemakaian warnet.
 
 ## 1. Ide Proyek
 
-Operator warnet sering mencatat pemakaian komputer secara manual sehingga rawan salah hitung dan status komputer tidak jelas. Knet mencatat sesi pemakaian, menghitung biaya, dan memperbarui status komputer secara otomatis lewat database.
+Membantu operator warnet yang mencatat sesi pemakaian, perhitungan biaya, dan perbaruan status komputer secara otomatis lewat form dan database.
 
 ## 2. Fungsionalitas Inti
 
 | No | Modul | Fungsi |
 |---|---|---|
-| 1 | Member | Tambah, ubah, hapus, cari |
-| 2 | Komputer | Tambah, ubah, hapus, atur tarif per jam |
-| 3 | Sesi | Mulai sesi dan akhiri sesi (biaya dan status komputer otomatis) |
-| 4 | Laporan | Riwayat sesi dan total pendapatan per tanggal |
+| 1 | Pendaftaran member | Tambah, ubah, hapus, cari |
+| 2 | Pendaftaran komputer | Tambah, ubah, hapus, cari |
+| 3 | Pendaftaran sesi | Mulai sesi dan akhiri sesi untuk setiap member (biaya terhitung otomastis dan status komputer berubah otomatis) |
+| 4 | Laporan | Riwayat sesi member dan total pendapatan per tanggal |
 
 ### Alur Singkat
 
-1. Operator mendaftarkan member dan mengisi data komputer.
-2. Operator memilih member dan komputer yang Tersedia, lalu menekan Mulai.
-3. Status komputer otomatis menjadi Dipakai.
-4. Operator menekan Akhiri, lalu biaya dihitung dan status komputer kembali Tersedia.
-5. Operator melihat riwayat dan pendapatan di form Laporan.
+1. Operator mendaftarkan member (Form member) dan mengisi data komputer (Form komputer).
+2. Operator memilih member dan komputer yang Tersedia, lalu menekan Mulai (Form sesi).
+3. Status komputer otomatis menjadi Dipakai (Form komputer).
+4. Operator menekan Akhiri (Form sesi), lalu biaya dihitung dan status komputer kembali Tersedia.
+5. Operator melihat riwayat dan pendapatan (Form Laporan).
 
 ## 3. Rancangan Database
 
@@ -29,16 +29,19 @@ Nama database: `db_knet`
 
 ### Tabel
 
-**member**: idMember (PK), nama, noHp, tanggalDaftar
+**Member (MemberModel.java)**: 
+int idMember (PK), String nama, String noHp, Date tanggalDaftar
 
-**komputer**: idKomputer (PK), namaKomputer (UNIQUE), tarifPerJam, status (Tersedia / Dipakai)
+**Komputer (KomputerModel.java)**: 
+int idKomputer (PK), String namaKomputer (UNIQUE), int tarifPerJam, String status (Tersedia / Dipakai)
 
-**sesi**: idSesi (PK), idMember (FK), idKomputer (FK), jamMulai, jamSelesai, totalBiaya
+**sesi (SesiModel.java)**: 
+int idSesi (PK), int idMember (FK), int idKomputer (FK), Timestamp jamMulai, TimeStamp jamSelesai, int totalBiaya
 
 ### Relasi
 
 ```
-member (1) -------- (N) sesi (N) -------- (1) komputer
+Member (1) -------- (N) Sesi (N) -------- (1) Komputer
 ```
 
 ### Fitur Database yang Dipakai
@@ -56,12 +59,12 @@ member (1) -------- (N) sesi (N) -------- (1) komputer
 
 ## 4. Rancangan Class
 
-Pola penulisan setiap class: constructor, getter, setter, input, proses, output.
+Pola penulisan setiap class: constructor (tanpa parameter dan dengan parameter), getter, setter, input, proses, output.
 
 | Package | Class | Tugas |
 |---|---|---|
 | entity | Member, Komputer, Sesi | Menampung data (atribut, constructor, getter, setter) |
-| model | MemberTableModel, KomputerTableModel, SesiTableModel | Mengatur data untuk tampilan JTable |
+| model | MemberModel, KomputerModel, SesiModel | Mengatur data untuk tampilan JTable |
 | repository | Koneksi, MemberRepository, KomputerRepository, SesiRepository | Akses database lewat JDBC |
 | view | FormMenuUtama, FormMember, FormKomputer, FormSesi, FormLaporan | Tampilan form Swing |
 

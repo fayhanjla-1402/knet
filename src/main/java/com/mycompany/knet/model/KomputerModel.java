@@ -15,6 +15,10 @@ public class KomputerModel {
     private String status;
 
     public KomputerModel() {
+        this.idKomputer = 0;
+        this.namaKomputer = "";
+        this.tarifPerJam = 0;
+        this.status = "Tersedia";
     }
 
     public KomputerModel(int idKomputer, String namaKomputer, int tarifPerJam, String status) {
@@ -38,6 +42,13 @@ public class KomputerModel {
 
     public String getStatus() {
         return status;
+    }
+    
+    public void setKomputerModel(int idKomputer, String namaKomputer, int tarifPerJam, String Status) {
+        this.idKomputer = idKomputer;
+        this.namaKomputer = namaKomputer;
+        this.tarifPerJam = tarifPerJam;
+        this.status = status;
     }
 
     public void setIdKomputer(int idKomputer) {

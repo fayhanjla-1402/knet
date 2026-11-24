@@ -3,7 +3,6 @@ package com.mycompany.knet.model;
 import java.sql.Timestamp;
 
 public class SesiModel {
-
     private int idSesi;
     private int idMember;
     private String namaMember;
@@ -15,6 +14,15 @@ public class SesiModel {
     private int totalBiaya;
 
     public SesiModel() {
+        this.idSesi = 0;
+        this.idMember = 0;
+        this.namaMember = "";
+        this.idKomputer = 0;
+        this.namaKomputer = "";
+        this.statusKomputer = "";
+        this.jamMulai = null;
+        this.jamSelesai = null;
+        this.totalBiaya = 0;
     }
 
     public SesiModel(int idSesi, int idMember, String namaMember, int idKomputer, String namaKomputer, String statusKomputer, Timestamp jamMulai, Timestamp jamSelesai, int totalBiaya) {
@@ -63,6 +71,18 @@ public class SesiModel {
 
     public int getTotalBiaya() {
         return totalBiaya;
+    }
+    
+    public void setSesiModel(int idSesi, int idMember, String namaMember, int idKomputer, String namaKomputer, String statusKomputer, Timestamp jamMulai, Timestamp jamSelesai, int totalBiaya) {
+        this.idSesi = idSesi;
+        this.idMember = idMember;
+        this.namaMember = namaMember;
+        this.idKomputer = idKomputer;
+        this.namaKomputer = namaKomputer;
+        this.statusKomputer = statusKomputer;
+        this.jamMulai = jamMulai;
+        this.jamSelesai = jamSelesai;
+        this.totalBiaya = totalBiaya;
     }
 
     public void setIdSesi(int idSesi) {
