@@ -9,6 +9,7 @@ public class SesiModel {
     private String namaMember;
     private int idKomputer;
     private String namaKomputer;
+    private String statusKomputer;
     private Timestamp jamMulai;
     private Timestamp jamSelesai;
     private int totalBiaya;
@@ -16,12 +17,13 @@ public class SesiModel {
     public SesiModel() {
     }
 
-    public SesiModel(int idSesi, int idMember, String namaMember, int idKomputer, String namaKomputer, Timestamp jamMulai, Timestamp jamSelesai, int totalBiaya) {
+    public SesiModel(int idSesi, int idMember, String namaMember, int idKomputer, String namaKomputer, String statusKomputer, Timestamp jamMulai, Timestamp jamSelesai, int totalBiaya) {
         this.idSesi = idSesi;
         this.idMember = idMember;
         this.namaMember = namaMember;
         this.idKomputer = idKomputer;
         this.namaKomputer = namaKomputer;
+        this.statusKomputer = statusKomputer;
         this.jamMulai = jamMulai;
         this.jamSelesai = jamSelesai;
         this.totalBiaya = totalBiaya;
@@ -45,6 +47,10 @@ public class SesiModel {
 
     public String getNamaKomputer() {
         return namaKomputer;
+    }
+
+    public String getStatusKomputer() {
+        return statusKomputer;
     }
 
     public Timestamp getJamMulai() {
@@ -77,6 +83,10 @@ public class SesiModel {
 
     public void setNamaKomputer(String namaKomputer) {
         this.namaKomputer = namaKomputer;
+    }
+
+    public void setStatusKomputer(String statusKomputer) {
+        this.statusKomputer = statusKomputer;
     }
 
     public void setJamMulai(Timestamp jamMulai) {

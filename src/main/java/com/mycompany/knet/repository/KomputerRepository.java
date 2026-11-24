@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class KomputerRepository {
     public List<KomputerModel> getAllKomputer() {
@@ -91,36 +92,37 @@ public class KomputerRepository {
     }
 
     public void updateStatusKomputer(int idKomputer, String status) {
-        String sqlCek = "SELECT COUNT(*) FROM sesi WHERE idKomputer = ? AND jamSelesai IS NULL";
-        String sqlUbah = "UPDATE komputer SET status = ? WHERE idKomputer = ?";
+        String cekSesi = "SELECT COUNT(*) FROM sesi "
+                       + "WHERE idKomputer = ? AND jamSelesai IS NULL";
+        String update = "UPDATE komputer SET status = ? "
+                      + "WHERE idKomputer = ?";
 
-        try (
-                Connection conn = DatabaseUtil.getConnection();
-                PreparedStatement stmtCek = conn.prepareStatement(sqlCek);
-                PreparedStatement stmtUbah = conn.prepareStatement(sqlUbah)
-        ) {
-            stmtCek.setInt(1, idKomputer);
-            ResultSet rs = stmtCek.executeQuery();
-            int jumlahSesiBerjalan = 0;
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement psCek = conn.prepareStatement(cekSesi)) {
 
-            if (rs.next()) {
-                jumlahSesiBerjalan = rs.getInt(1);
+            psCek.setInt(1, idKomputer);
+
+            try (ResultSet rs = psCek.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0
+                        && status.equals("Tersedia")) {
+
+                    JOptionPane.showMessageDialog(null,"Komputer sedang digunakan dalam sesi!\n"
+                        + "Status tetap Dipakai.");
+
+                    return;
+                }
             }
 
-            rs.close();
+            try (PreparedStatement psUpdate = conn.prepareStatement(update)) {
+                psUpdate.setString(1, status);
+                psUpdate.setInt(2, idKomputer);
+                psUpdate.executeUpdate();
 
-            if (jumlahSesiBerjalan > 0 && status.equals("Tersedia")) {
-                throw new RuntimeException("Komputer ini masih punya sesi berjalan, akhiri sesinya dulu!");
             }
 
-            stmtUbah.setString(1, status);
-            stmtUbah.setInt(2, idKomputer);
-            stmtUbah.executeUpdate();
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Gagal mengubah status komputer!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "Gagal mengubah status: " + e.getMessage());
         }
     }
 

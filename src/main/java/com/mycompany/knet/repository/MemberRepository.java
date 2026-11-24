@@ -1,14 +1,15 @@
 package com.mycompany.knet.repository;
 
-import com.mycompany.knet.model.MemberModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import com.mycompany.knet.model.MemberModel;
 
 public class MemberRepository {
+
     public List<MemberModel> getAllMembers() {
         try (
                 Connection conn = DatabaseUtil.getConnection();
@@ -44,6 +45,10 @@ public class MemberRepository {
     }
 
     public void addMember(MemberModel member) {
+        if (noHpSudahAda(member.getNoHp(), 0)) {
+            throw new RuntimeException("Nomor HP sudah terdaftar!");
+        }
+
         String sql = "INSERT INTO member (nama, noHp, tanggalDaftar) VALUES (?, ?, CURDATE())";
 
         try (
@@ -60,6 +65,10 @@ public class MemberRepository {
     }
 
     public void updateMember(MemberModel member) {
+        if (noHpSudahAda(member.getNoHp(), member.getIdMember())) {
+            throw new RuntimeException("Nomor HP sudah dipakai member lain!");
+        }
+
         String sql = "UPDATE member SET nama = ?, noHp = ? WHERE idMember = ?";
 
         try (
@@ -88,6 +97,35 @@ public class MemberRepository {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException("Gagal menghapus member, member ini sudah tercatat di data sesi!");
+        }
+    }
+
+    private boolean noHpSudahAda(String noHp, int idMember) {
+        if (noHp == null || noHp.equals("")) {
+            return false;
+        }
+
+        String sql = "SELECT COUNT(*) FROM member WHERE noHp = ? AND idMember <> ?";
+
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, noHp);
+            stmt.setInt(2, idMember);
+
+            ResultSet rs = stmt.executeQuery();
+            int jumlah = 0;
+
+            if (rs.next()) {
+                jumlah = rs.getInt(1);
+            }
+
+            rs.close();
+            return jumlah > 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Gagal memeriksa nomor HP!");
         }
     }
 

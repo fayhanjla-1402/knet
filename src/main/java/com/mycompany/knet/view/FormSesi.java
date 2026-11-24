@@ -257,7 +257,8 @@ public class FormSesi extends javax.swing.JFrame {
         jScrollPane1.setBackground(new java.awt.Color(173, 209, 198));
 
         jtSesi.setBackground(new java.awt.Color(173, 209, 198));
-        jtSesi.setForeground(new java.awt.Color(255, 255, 255));
+        jtSesi.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtSesi.setForeground(new java.awt.Color(51, 51, 51));
         jtSesi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},

@@ -1,6 +1,5 @@
 package com.mycompany.knet.repository;
 
-import com.mycompany.knet.model.SesiModel;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -11,12 +10,16 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import com.mycompany.knet.model.SesiModel;
 
 public class SesiRepository {
+
+    private String sqlDasar = "SELECT v.*, k.status AS statusKomputer FROM vRiwayatSesi v JOIN komputer k ON v.idKomputer = k.idKomputer ";
+
     public List<SesiModel> getAllSesi() {
         try (
                 Connection conn = DatabaseUtil.getConnection();
-                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM vRiwayatSesi ORDER BY idSesi DESC");
+                PreparedStatement stmt = conn.prepareStatement(sqlDasar + "ORDER BY v.idSesi DESC");
                 ResultSet rs = stmt.executeQuery()
         ) {
             return bacaDaftarSesi(rs);
@@ -27,7 +30,7 @@ public class SesiRepository {
     }
 
     public List<SesiModel> getSesiBerjalan() {
-        String sql = "SELECT * FROM vRiwayatSesi WHERE jamSelesai IS NULL ORDER BY idSesi";
+        String sql = sqlDasar + "WHERE v.jamSelesai IS NULL ORDER BY v.idSesi";
 
         try (
                 Connection conn = DatabaseUtil.getConnection();
@@ -42,7 +45,7 @@ public class SesiRepository {
     }
 
     public List<SesiModel> getSesiByTanggal(Date tanggal) {
-        String sql = "SELECT * FROM vRiwayatSesi WHERE DATE(jamMulai) = ? ORDER BY idSesi DESC";
+        String sql = sqlDasar + "WHERE DATE(v.jamMulai) = ? ORDER BY v.idSesi DESC";
 
         try (
                 Connection conn = DatabaseUtil.getConnection();
@@ -105,26 +108,42 @@ public class SesiRepository {
     }
 
     public void addSesi(SesiModel sesi) {
-        String sql = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
+        String sqlSesi = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
+        String sqlStatus = "UPDATE komputer SET status = 'Dipakai' WHERE idKomputer = ? AND status = 'Tersedia'";
 
-        try (
-                Connection conn = DatabaseUtil.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
-            stmt.setInt(1, sesi.getIdMember());
-            stmt.setInt(2, sesi.getIdKomputer());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        try (Connection conn = DatabaseUtil.getConnection()) {
+            conn.setAutoCommit(false);
 
-            if ("45000".equals(ex.getSQLState())) {
-                throw new RuntimeException(ex.getMessage());
+            try (
+                    PreparedStatement stmtStatus = conn.prepareStatement(sqlStatus);
+                    PreparedStatement stmtSesi = conn.prepareStatement(sqlSesi)
+            ) {
+                stmtStatus.setInt(1, sesi.getIdKomputer());
+
+                int berhasil = stmtStatus.executeUpdate();
+
+                if (berhasil == 0) {
+                    throw new RuntimeException(
+                            "Komputer tidak tersedia!"
+                    );
+                }
+
+                stmtSesi.setInt(1, sesi.getIdMember());
+                stmtSesi.setInt(2, sesi.getIdKomputer());
+                stmtSesi.executeUpdate();
+
+                conn.commit();
+
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
             }
 
-            throw new RuntimeException("Gagal memulai sesi!");
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new RuntimeException("Gagal memulai sesi!");
+            throw new RuntimeException(
+                    "Gagal memulai sesi: " + ex.getMessage()
+            );
         }
     }
 
@@ -161,11 +180,12 @@ public class SesiRepository {
             String namaMember = rs.getString("namaMember");
             int idKomputer = rs.getInt("idKomputer");
             String namaKomputer = rs.getString("namaKomputer");
+            String statusKomputer = rs.getString("statusKomputer");
             Timestamp jamMulai = rs.getTimestamp("jamMulai");
             Timestamp jamSelesai = rs.getTimestamp("jamSelesai");
             int totalBiaya = rs.getInt("totalBiaya");
 
-            SesiModel sesiModel = new SesiModel(idSesi, idMember, namaMember, idKomputer, namaKomputer, jamMulai, jamSelesai, totalBiaya);
+            SesiModel sesiModel = new SesiModel(idSesi, idMember, namaMember, idKomputer, namaKomputer, statusKomputer, jamMulai, jamSelesai, totalBiaya);
             daftarSesi.add(sesiModel);
         }
 

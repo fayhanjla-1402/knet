@@ -31,6 +31,17 @@ public class FormKomputer extends javax.swing.JFrame {
         aturComboBoxStatus();
         aturHeaderTabel();
         
+        jtKomputer.getModel().addTableModelListener(e -> {
+            int baris = jtKomputer.getSelectedRow();
+
+            if (e.getColumn() == 3 && baris != -1
+                    && e.getFirstRow() == baris) {
+                tfStatus.setText(
+                    jtKomputer.getValueAt(baris, 3).toString()
+                );
+            }
+        });
+        
         jtKomputer.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int baris = jtKomputer.getSelectedRow();
@@ -38,6 +49,7 @@ public class FormKomputer extends javax.swing.JFrame {
                 if (baris != -1) {
                     tfKode.setText(jtKomputer.getValueAt(baris, 1).toString());
                     tfTarif.setText(jtKomputer.getValueAt(baris, 2).toString());
+                    tfStatus.setText(jtKomputer.getValueAt(baris, 3).toString());
                 }
             }
         });
@@ -485,6 +497,10 @@ public class FormKomputer extends javax.swing.JFrame {
 
     private void BtnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnUbahActionPerformed
         try {
+            if (jtKomputer.isEditing()) {
+                jtKomputer.getCellEditor().stopCellEditing();
+            }
+
             int baris = jtKomputer.getSelectedRow();
 
             if (baris == -1) {
@@ -493,6 +509,7 @@ public class FormKomputer extends javax.swing.JFrame {
 
             String nama = tfKode.getText().trim();
             String tarifText = tfTarif.getText().trim();
+            String status = jtKomputer.getValueAt(baris, 3).toString();
 
             if (nama.isEmpty() || tarifText.isEmpty()) {
                 throw new Exception("Data tidak boleh kosong!");
@@ -504,19 +521,21 @@ public class FormKomputer extends javax.swing.JFrame {
                 throw new Exception("Tarif harus lebih dari 0!");
             }
 
-            int id = Integer.parseInt(jtKomputer.getValueAt(baris, 0).toString());
-            String status = jtKomputer.getValueAt(baris, 3).toString();
+            int id = Integer.parseInt(
+                jtKomputer.getValueAt(baris, 0).toString()
+            );
 
-            KomputerModel komputer = new KomputerModel(id, nama, tarif, status);
+            KomputerModel komputer =
+                new KomputerModel(id, nama, tarif, status);
 
             kr.updateKomputer(komputer);
-
-            JOptionPane.showMessageDialog(this, "Data berhasil diubah!");
+            kr.updateStatusKomputer(id, status);
 
             tfKode.setText("");
             tfTarif.setText("");
+            tfStatus.setText("");
 
-            BtnTampilActionPerformed(evt);
+            renderTable(kr.getAllKomputer());
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Tarif harus berupa angka!");

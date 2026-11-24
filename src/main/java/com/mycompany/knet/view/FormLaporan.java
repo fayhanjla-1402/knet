@@ -17,6 +17,9 @@ import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import java.text.ParseException;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
@@ -30,42 +33,50 @@ public class FormLaporan extends javax.swing.JFrame {
     public FormLaporan() {
         initComponents();
         renderTable(sr.getAllSesi());
-        setLocationRelativeTo(null);
-        aturHeaderTabel();
         tfTanggal.setText(LocalDate.now().toString());
-        tampilSemua();
-    }
-
-    private void tampilSemua() {
-        try {
-            List<SesiModel> daftar = sr.getAllSesi();
-            renderTable(daftar);
-
-            lblKeterangan.setText("Total pendapatan seluruh sesi (" + daftar.size() + " sesi)");
-            lblTotal.setText("Rp " + formatAngka(sr.getTotalPendapatan()));
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
-        }
+        tfTanggal.setEditable(true);
+        tfTanggal.setCaretColor(Color.WHITE);
+        tfTanggal.addActionListener(this::btnTanggalActionPerformed);
+        aturHeaderTabel();
     }
 
     private void tampilPerTanggal() {
-        String teks = tfTanggal.getText().trim();
+        Date tanggal = bacaTanggal(tfTanggal.getText().trim());
 
-        try {
-            Date tanggal = Date.valueOf(teks);
+        if (tanggal == null) {
+            JOptionPane.showMessageDialog(this, "Format tanggal tidak dikenali. Gunakan yyyy-MM-dd, dd-MM-yyyy, atau dd/MM/yyyy, contoh: 2026-11-09");
+        } else {
+            try {
+                tfTanggal.setText(tanggal.toString());
 
-            List<SesiModel> daftar = sr.getSesiByTanggal(tanggal);
-            renderTable(daftar);
+                List<SesiModel> daftar = sr.getSesiByTanggal(tanggal);
+                renderTable(daftar);
 
-            lblKeterangan.setText("Total pendapatan tanggal " + teks + " (" + daftar.size() + " sesi)");
-            lblTotal.setText("Rp " + formatAngka(sr.getPendapatanByTanggal(tanggal)));
+                lblKeterangan.setText("Total pendapatan tanggal " + tanggal + " (" + daftar.size() + " sesi)");
+                lblTotal.setText("Rp " + formatAngka(sr.getPendapatanByTanggal(tanggal)));
 
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, "Format tanggal harus yyyy-MM-dd, contoh: 2026-11-09");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
         }
+    }
+
+    private Date bacaTanggal(String teks) {
+        String[] daftarFormat = {"yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy"};
+
+        for (int i = 0; i < daftarFormat.length; i++) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat(daftarFormat[i]);
+                format.setLenient(false);
+
+                java.util.Date hasil = format.parse(teks);
+                return new Date(hasil.getTime());
+            } catch (ParseException ex) {
+                // format ini tidak cocok, coba format berikutnya
+            }
+        }
+
+        return null;
     }
 
     private void renderTable(List<SesiModel> daftarSesi) {
@@ -432,7 +443,7 @@ public class FormLaporan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTanggalActionPerformed
 
     private void btnSemuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSemuaActionPerformed
-        tampilSemua();
+        renderTable(sr.getAllSesi());
     }//GEN-LAST:event_btnSemuaActionPerformed
 
     /**
