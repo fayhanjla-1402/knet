@@ -11,17 +11,17 @@ Membantu operator warnet yang mencatat sesi pemakaian, perhitungan biaya, dan pe
 | No | Modul | Fungsi |
 |---|---|---|
 | 1 | Pendaftaran member | Tambah, ubah, hapus, cari |
-| 2 | Pendaftaran komputer | Tambah, ubah, hapus, cari |
-| 3 | Pendaftaran sesi | Mulai sesi dan akhiri sesi untuk setiap member (biaya terhitung otomastis dan status komputer berubah otomatis) |
-| 4 | Laporan | Riwayat sesi member dan total pendapatan per tanggal |
+| 2 | Pendaftaran komputer | Tambah, ubah, hapus, cari, atur tarif per jam |
+| 3 | Pendaftaran sesi | Mulai sesi dan akhiri sesi untuk setiap member (biaya terhitung otomatis dan status komputer berubah otomatis) |
+| 4 | Laporan | Riwayat sesi member dan total pendapatan per tanggal maupun keseluruhan |
 
 ### Alur Singkat
 
-1. Operator mendaftarkan member (Form member) dan mengisi data komputer (Form komputer).
-2. Operator memilih member dan komputer yang Tersedia, lalu menekan Mulai (Form sesi).
-3. Status komputer otomatis menjadi Dipakai (Form komputer).
-4. Operator menekan Akhiri (Form sesi), lalu biaya dihitung dan status komputer kembali Tersedia.
-5. Operator melihat riwayat dan pendapatan (Form Laporan).
+1. Operator mendaftarkan member (FormMember) dan mengisi data komputer (FormKomputer).
+2. Operator memilih member dan komputer yang Tersedia, lalu menekan Mulai Sesi (FormSesi).
+3. Status komputer otomatis menjadi Dipakai.
+4. Operator memilih sesi yang berjalan lalu menekan Akhiri Sesi (FormSesi). Biaya dihitung dan status komputer kembali Tersedia.
+5. Operator melihat riwayat dan pendapatan (FormLaporan).
 
 ## 3. Rancangan Database
 
@@ -29,19 +29,19 @@ Nama database: `db_knet`
 
 ### Tabel
 
-**Member (MemberModel.java)**: 
-int idMember (PK), String nama, String noHp, Date tanggalDaftar
+**member** (data di aplikasi: `MemberModel`)
+`idMember` INT (PK, auto increment), `nama` VARCHAR(50) NOT NULL, `noHp` VARCHAR(15), `tanggalDaftar` DATE NOT NULL
 
-**Komputer (KomputerModel.java)**: 
-int idKomputer (PK), String namaKomputer (UNIQUE), int tarifPerJam, String status (Tersedia / Dipakai)
+**komputer** (data di aplikasi: `KomputerModel`)
+`idKomputer` INT (PK, auto increment), `namaKomputer` VARCHAR(30) NOT NULL UNIQUE, `tarifPerJam` INT NOT NULL, `status` VARCHAR(10) NOT NULL DEFAULT 'Tersedia' (Tersedia / Dipakai)
 
-**sesi (SesiModel.java)**: 
-int idSesi (PK), int idMember (FK), int idKomputer (FK), Timestamp jamMulai, TimeStamp jamSelesai, int totalBiaya
+**sesi** (data di aplikasi: `SesiModel`)
+`idSesi` INT (PK, auto increment), `idMember` INT (FK), `idKomputer` INT (FK), `jamMulai` DATETIME NOT NULL, `jamSelesai` DATETIME (kosong selama sesi berjalan), `totalBiaya` INT NOT NULL DEFAULT 0
 
 ### Relasi
 
 ```
-Member (1) -------- (N) Sesi (N) -------- (1) Komputer
+member (1) -------- (N) sesi (N) -------- (1) komputer
 ```
 
 ### Fitur Database yang Dipakai
@@ -50,7 +50,7 @@ Member (1) -------- (N) Sesi (N) -------- (1) Komputer
 |---|---|---|
 | Foreign Key | sesi.idMember, sesi.idKomputer | Menjaga keterkaitan data antartabel |
 | Constraint | NOT NULL, UNIQUE, DEFAULT | Menjaga data tetap valid |
-| View | vRiwayatSesi | Gabungan sesi, member, dan komputer (JOIN) untuk laporan |
+| View | vRiwayatSesi | Gabungan sesi, member, dan komputer (JOIN) untuk riwayat dan laporan |
 | Trigger | trgSesiCekKomputer | Sebelum sesi ditambah, menolak jika komputer masih Dipakai |
 | Trigger | trgSesiMulai | Setelah sesi ditambah, status komputer menjadi Dipakai |
 | Trigger | trgSesiSelesai | Setelah jamSelesai terisi, status komputer menjadi Tersedia |
@@ -59,48 +59,54 @@ Member (1) -------- (N) Sesi (N) -------- (1) Komputer
 
 ## 4. Rancangan Class
 
-Pola penulisan setiap class: constructor (tanpa parameter dan dengan parameter), getter, setter, input, proses, output.
+Proyek dibagi menjadi tiga lapisan. Setiap class model berisi constructor (tanpa parameter dan dengan parameter), getter, dan setter. Input dan output ditangani oleh view, sedangkan proses ke database ditangani oleh repository.
 
 | Package | Class | Tugas |
 |---|---|---|
-| entity | Member, Komputer, Sesi | Menampung data (atribut, constructor, getter, setter) |
-| model | MemberModel, KomputerModel, SesiModel | Mengatur data untuk tampilan JTable |
-| repository | Koneksi, MemberRepository, KomputerRepository, SesiRepository | Akses database lewat JDBC |
-| view | FormMenuUtama, FormMember, FormKomputer, FormSesi, FormLaporan | Tampilan form Swing |
+| (utama) | Knet | Titik masuk program, membuka FormMember |
+| model | MemberModel, KomputerModel, SesiModel | Menampung data (atribut, constructor, getter, setter) |
+| repository | DatabaseUtil, MemberRepository, KomputerRepository, SesiRepository | Koneksi dan akses database lewat JDBC |
+| view | FormMember, FormKomputer, FormSesi, FormLaporan | Tampilan form Swing. FormMember juga berfungsi sebagai menu utama. |
 
-Method utama di repository: `simpanData`, `ubahData`, `hapusData`, `cariData`, `ambilSemuaData`. Khusus SesiRepository: `mulaiSesi`, `akhiriSesi` (memanggil `spAkhiriSesi`), `ambilSesiBerjalan`, `ambilRiwayat`, `ambilRiwayatPerTanggal`, `ambilPendapatanPerTanggal`, `ambilPendapatanTotal`.
+Method utama di repository:
+
+| Repository | Method |
+|---|---|
+| MemberRepository | `getAllMembers`, `searchMembers`, `addMember`, `updateMember`, `deleteMember` |
+| KomputerRepository | `getAllKomputer`, `getKomputerTersedia`, `searchKomputer`, `addKomputer`, `updateKomputer`, `updateStatusKomputer`, `deleteKomputer` |
+| SesiRepository | `getAllSesi`, `getSesiBerjalan`, `getSesiByTanggal`, `getTotalPendapatan`, `getPendapatanByTanggal`, `addSesi`, `finishSesi` (memanggil `spAkhiriSesi`) |
+
+Alur satu aksi: view menerima input, membungkusnya dalam model, memanggil repository, lalu menampilkan hasilnya ke tabel atau dialog.
 
 ## 5. Pembagian File per Anggota
+
+Path file Java berada di `src/main/java/com/mycompany/knet/`.
 
 ### Theresia : Member dan Fondasi Database
 
 | File | Keterangan |
 |---|---|
 | resources/script.sql | Bagian pembuatan database, tabel, constraint, dan data awal |
-| repository/Koneksi.java | Koneksi JDBC |
-| entity/Member.java | Data member |
-| model/MemberTableModel.java | Tabel member |
+| repository/DatabaseUtil.java | Koneksi JDBC |
+| model/MemberModel.java | Data member |
 | repository/MemberRepository.java | CRUD member |
-| view/FormMember.java | Form member |
+| view/FormMember.java | Form member dan menu navigasi |
 | README.md | Dokumentasi proyek |
 
-### Meshal : Komputer dan Menu
+### Meshal : Komputer
 
 | File | Keterangan |
 |---|---|
-| entity/Komputer.java | Data komputer |
-| model/KomputerTableModel.java | Tabel komputer |
+| model/KomputerModel.java | Data komputer |
 | repository/KomputerRepository.java | CRUD komputer |
 | view/FormKomputer.java | Form komputer |
-| view/FormMenuUtama.java | Menu navigasi |
 
 ### Fayha : Sesi, Laporan, dan Logika Database
 
 | File | Keterangan |
 |---|---|
 | resources/script.sql | Bagian view, trigger, dan stored procedure |
-| entity/Sesi.java | Data sesi |
-| model/SesiTableModel.java | Tabel sesi dan riwayat |
+| model/SesiModel.java | Data sesi dan riwayat |
 | repository/SesiRepository.java | Mulai sesi, akhiri sesi, riwayat, pendapatan |
 | view/FormSesi.java | Form sesi |
 | view/FormLaporan.java | Form laporan |
@@ -109,6 +115,8 @@ File `script.sql` dikerjakan bersama: bagian tabel dan data awal member/komputer
 
 ## 6. Cara Menjalankan
 
-1. Jalankan `src/main/resources/script.sql` di MySQL (klien `mysql`, Workbench, atau HeidiSQL) untuk membuat database `db_knet`, termasuk view, trigger, dan stored procedure.
-2. Sesuaikan url, user, dan password di `Koneksi.java`.
-3. Buka proyek di NetBeans (Maven akan mengunduh MySQL Connector/J otomatis), lalu jalankan class `Knet` atau `FormMenuUtama`.
+Kebutuhan: JDK 21, Maven, dan MySQL.
+
+1. Jalankan `src/main/resources/script.sql` di MySQL (klien `mysql`, Workbench, atau HeidiSQL) untuk membuat database `db_knet`, termasuk view, trigger, stored procedure, dan data awal.
+2. Sesuaikan url (host dan port), user, dan password di `src/main/java/com/mycompany/knet/repository/DatabaseUtil.java`.
+3. Buka proyek di NetBeans (Maven akan mengunduh MySQL Connector/J otomatis), lalu jalankan class `Knet`. Form yang pertama tampil adalah FormMember.

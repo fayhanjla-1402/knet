@@ -108,37 +108,17 @@ public class SesiRepository {
     }
 
     public void addSesi(SesiModel sesi) {
-        String sqlSesi = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
-        String sqlStatus = "UPDATE komputer SET status = 'Dipakai' WHERE idKomputer = ? AND status = 'Tersedia'";
+        String sql = "INSERT INTO sesi (idMember, idKomputer, jamMulai) VALUES (?, ?, NOW())";
 
-        try (Connection conn = DatabaseUtil.getConnection()) {
-            conn.setAutoCommit(false);
-
-            try (
-                    PreparedStatement stmtStatus = conn.prepareStatement(sqlStatus);
-                    PreparedStatement stmtSesi = conn.prepareStatement(sqlSesi)
-            ) {
-                stmtStatus.setInt(1, sesi.getIdKomputer());
-
-                int berhasil = stmtStatus.executeUpdate();
-
-                if (berhasil == 0) {
-                    throw new RuntimeException(
-                            "Komputer tidak tersedia!"
-                    );
-                }
-
-                stmtSesi.setInt(1, sesi.getIdMember());
-                stmtSesi.setInt(2, sesi.getIdKomputer());
-                stmtSesi.executeUpdate();
-
-                conn.commit();
-
-            } catch (Exception ex) {
-                conn.rollback();
-                throw ex;
-            }
-
+        try (
+                Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, sesi.getIdMember());
+            stmt.setInt(2, sesi.getIdKomputer());
+            // trgSesiCekKomputer menolak jika komputer sedang dipakai,
+            // trgSesiMulai mengubah status komputer menjadi Dipakai
+            stmt.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(

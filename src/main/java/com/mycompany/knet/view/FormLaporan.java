@@ -32,12 +32,19 @@ public class FormLaporan extends javax.swing.JFrame {
 
     public FormLaporan() {
         initComponents();
-        renderTable(sr.getAllSesi());
+        tampilSemua();
         tfTanggal.setText(LocalDate.now().toString());
         tfTanggal.setEditable(true);
         tfTanggal.setCaretColor(Color.WHITE);
         tfTanggal.addActionListener(this::btnTanggalActionPerformed);
         aturHeaderTabel();
+    }
+
+    private void tampilSemua() {
+        renderTable(sr.getAllSesi());
+
+        lblKeterangan.setText("Total pendapatan seluruh sesi");
+        lblTotal.setText("Rp " + formatAngka(sr.getTotalPendapatan()));
     }
 
     private void tampilPerTanggal() {
@@ -443,7 +450,7 @@ public class FormLaporan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTanggalActionPerformed
 
     private void btnSemuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSemuaActionPerformed
-        renderTable(sr.getAllSesi());
+        tampilSemua();
     }//GEN-LAST:event_btnSemuaActionPerformed
 
     /**

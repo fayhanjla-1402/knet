@@ -1,1 +1,14 @@
+# Hasil build Maven
 /target/
+
+# File sistem macOS
+.DS_Store
+
+# File pribadi IDE
+/nbproject/private/
+/build/
+.idea/
+*.iml
+
+# Log
+*.log
